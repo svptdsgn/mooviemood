@@ -128,7 +128,7 @@
     }
     .movie-logline { font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.8); margin-bottom: 28px; }
 
-    /* НОВЫЙ БЛОК ИИ (перенесли сюда) */
+    /* БЛОК ИИ (НАВЕРХУ) */
     .ai-recommendation-block {
         background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.03) 100%);
         border: 1px solid rgba(168, 85, 247, 0.25); border-radius: var(--radius-sm); padding: 20px;
@@ -409,7 +409,7 @@
 <script>
     var movies = [];
     var teamFilter = 'cast';
-    var similarFilter = 'genre'; // Изменено по умолчанию на жанр
+    var similarFilter = 'genre';
     var userState = { saved: {}, watched: {}, hidden: {} };
 
     try {
@@ -448,6 +448,43 @@
         if (h > 0 && m > 0) return h + 'ч ' + m + ' мин';
         if (h > 0) return h + 'ч';
         return m + ' мин';
+    }
+
+    // Генератор умного описания "Почему стоит посмотреть"
+    function generateAiRecommendation(movie) {
+        var parts = [];
+        
+        // 1. Берем первые 2 предложения из синопсиса
+        if (movie.synopsis) {
+            var sentences = movie.synopsis.split('. ');
+            var shortSynopsis = sentences.slice(0, 2).join('. ');
+            if (shortSynopsis.length > 10) parts.push(shortSynopsis + (shortSynopsis.endsWith('.') ? '' : '.'));
+        }
+
+        // 2. Добавляем упоминание жанров и настроения
+        var genreText = movie.genres && movie.genres.length ? movie.genres.join(' и ') : '';
+        var moodText = movie.mood ? movie.mood.toLowerCase() : '';
+        
+        if (genreText && moodText) {
+            parts.push('Это ' + genreText + ' кино с ' + moodText + ' атмосферой.');
+        } else if (genreText) {
+            parts.push('Это ' + genreText + ' кино.');
+        } else if (moodText) {
+            parts.push('Кино с ' + moodText + ' атмосферой.');
+        }
+
+        // 3. Добавляем упоминание рейтинга или режиссера
+        if (movie.rating >= 8.0) {
+            parts.push('Высокий рейтинг (' + movie.rating + ') подтверждает его качество.');
+        } else if (movie.directors && movie.directors.length) {
+            parts.push('Режиссерская работа ' + movie.directors[0] + ' заслуживает внимания.');
+        }
+
+        var result = parts.join(' ');
+        if (result.length < 20) {
+            return 'Этот фильм — отличный выбор для вечера, если вы цените ' + (genreText || 'хорошее кино') + '.';
+        }
+        return result;
     }
 
     function createSimilarCard(movie) {
@@ -539,7 +576,6 @@
         var similar = [];
         
         if (similarFilter === 'mood') {
-            // Улучшенная логика: ищем совпадение хотя бы по одному слову в настроении
             var movieMoodWords = movie.mood ? movie.mood.toLowerCase().split(/\s+/) : [];
             similar = movies.filter(function(m) {
                 if (m.id === movie.id) return false;
@@ -678,8 +714,10 @@
             '<div class="spec-row"><div class="spec-label">Премьера</div><div class="spec-values"><span class="spec-tag">' + (movie.premiere || movie.year) + '</span></div></div>';
 
         var votesText = movie.votes ? movie.votes.toLocaleString('ru-RU') + ' оценок' : 'Оценок пока нет';
+        
+        // Вызываем генератор
+        var aiRecText = generateAiRecommendation(movie);
 
-        // НОВАЯ СТРУКТУРА: Блок ИИ перенесен сюда, сразу после логлайна
         container.innerHTML =
             '<section class="movie-hero">' +
                 '<div class="movie-trailer-wrapper"><img src="' + (movie.trailer || movie.poster) + '" alt="' + movie.title + '">' +
@@ -692,7 +730,7 @@
                     // ВСТАВЛЕННЫЙ БЛОК ИИ
                     '<div class="ai-recommendation-block">' +
                         '<div class="ai-rec-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg><span>Почему стоит посмотреть</span></div>' +
-                        '<p class="ai-rec-text">' + (movie.aiRecommendation || "Этот фильм обладает уникальной атмосферой и сильным сюжетом, который не оставит вас равнодушным.") + '</p>' +
+                        '<p class="ai-rec-text">' + aiRecText + '</p>' +
                     '</div>' +
                     // КОНЕЦ БЛОКА ИИ
 
@@ -735,7 +773,6 @@
                 '<div class="team-grid" id="team-grid"></div>' +
             '</section>' +
 
-            // ИЗМЕНЕННЫЙ ПОРЯДОК ФИЛЬТРОВ: Жанр теперь первый и активный по умолчанию
             '<section class="similar-section" id="similar-section">' +
                 '<h2 class="similar-title">Похожие фильмы</h2>' +
                 '<div class="similar-filters">' +
@@ -796,7 +833,6 @@
                         mood: item.content.mood,
                         logline: item.content.logline,
                         synopsis: item.content.synopsis,
-                        aiRecommendation: "Этот фильм обладает уникальной атмосферой и сильным сюжетом, который не оставит вас равнодушным.",
                         directors: item.creators.directors,
                         screenwriters: item.creators.screenwriters,
                         producers: item.creators.producers,
