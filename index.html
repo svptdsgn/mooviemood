@@ -80,80 +80,29 @@
   .chat-input-row button { background: var(--surface); color: var(--text-dark); border: none; padding: 0 20px; border-radius: 100px; font-size: 18px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
   .chat-input-row button:hover { opacity: 0.9; }
 
-  /* МОДАЛКА ГЛАЗА — как на скрине 2, один в один */
-  .eye-modal { max-width: 800px; width: 90%; padding: 0; overflow: hidden; display: flex; flex-direction: row; min-height: 420px; background: #0F0F0F; }
-  .eye-modal-poster { width: 40%; background-size: cover; background-position: center; position: relative; }
-  .eye-modal-content { width: 60%; padding: 36px 32px; display: flex; flex-direction: column; position: relative; background: #0F0F0F; }
+  /* --- ИСПРАВЛЕННАЯ МОДАЛКА ГЛАЗА (как на скрине 1) --- */
+  .eye-modal { max-width: 900px; width: 90%; padding: 0; overflow: hidden; display: flex; flex-direction: row; min-height: 500px; background: #0F0F0F; border-radius: var(--radius-md); }
+  .eye-modal-poster { width: 45%; background-size: cover; background-position: center; position: relative; }
+  .eye-modal-content { width: 55%; padding: 40px; display: flex; flex-direction: column; position: relative; background: #0F0F0F; }
   .eye-modal .modal-close { position: absolute; top: 16px; right: 16px; display: flex !important; }
-  .eye-modal-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; color: var(--text-main); }
-  .eye-modal-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .eye-badge { padding: 6px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+  .eye-modal-title { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px; color: var(--text-main); }
+  .eye-modal-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+  .eye-badge { padding: 8px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; color: #fff; }
   .eye-badge.rating { background: linear-gradient(135deg,#22C55E 0%,#16A34A 100%); border-color: transparent; font-weight: 700; }
   .eye-badge.rating.medium { background: linear-gradient(135deg,#FACC15 0%,#EAB308 100%); color: #000; }
   .eye-badge.rating.low { background: linear-gradient(135deg,#EF4444 0%,#DC2626 100%); }
-  .eye-ai-block { background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 100%); border: 1px solid rgba(168,85,247,0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px; flex-grow: 1; display: flex; flex-direction: column; }
-  .eye-ai-title { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: #C084FC; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; flex-shrink: 0; }
+  .eye-ai-block { background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 100%); border: 1px solid rgba(168,85,247,0.2); border-radius: 16px; padding: 24px; margin-bottom: 24px; flex-grow: 1; display: flex; flex-direction: column; }
+  .eye-ai-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #C084FC; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; flex-shrink: 0; }
   .eye-ai-title svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; }
-  .eye-ai-text { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.85); font-weight: 400; overflow-y: auto; max-height: 200px; padding-right: 10px; }
+  .eye-ai-text { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.85); font-weight: 400; overflow-y: auto; max-height: 250px; padding-right: 10px; }
   .eye-ai-text::-webkit-scrollbar { width: 4px; }
   .eye-ai-text::-webkit-scrollbar-track { background: transparent; }
   .eye-ai-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-  .eye-watch-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg,#A855F7 0%,#7C3AED 100%); color: white; border: none; padding: 14px 28px; border-radius: 100px; font-size: 15px; font-weight: 600; font-family: var(--font); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(168,85,247,0.3); width: 100%; margin-top: auto; flex-shrink: 0; text-decoration: none; }
+  .eye-watch-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg,#A855F7 0%,#7C3AED 100%); color: white; border: none; padding: 16px 28px; border-radius: 100px; font-size: 16px; font-weight: 600; font-family: var(--font); cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(168,85,247,0.3); width: 100%; margin-top: auto; flex-shrink: 0; text-decoration: none; }
   .eye-watch-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(168,85,247,0.5); }
-  .eye-watch-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .eye-watch-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-  .filter-group { margin-bottom: 24px; }
-  .filter-label { font-size: 14px; font-weight: 500; color: var(--text-muted); margin-bottom: 14px; display: block; }
-  .options-row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .option-chip { padding: 10px 18px; background: transparent; border: 1px solid var(--border-color); border-radius: 100px; color: var(--text-muted); font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; }
-  .option-chip:hover { border-color: rgba(255,255,255,0.3); color: var(--text-main); }
-  .option-chip.active { background: var(--surface); color: var(--text-dark); border-color: var(--surface); font-weight: 500; }
-  .duration-selector { display: flex; flex-wrap: wrap; gap: 10px; }
-  .duration-chip { padding: 10px 18px; background: transparent; border: 1px solid var(--border-color); border-radius: 100px; color: var(--text-muted); font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
-  .duration-chip:hover { border-color: rgba(255,255,255,0.3); color: var(--text-main); }
-  .duration-chip.active { background: var(--surface); color: var(--text-dark); border-color: var(--surface); font-weight: 500; }
-  .toggle-group { margin-top: 24px; }
-  .toggle-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .toggle-label { font-size: 14px; color: var(--text-main); }
-  .toggle-switch { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 100px; position: relative; cursor: pointer; transition: background 0.3s; }
-  .toggle-switch.active { background: var(--accent); }
-  .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--surface); border-radius: 50%; transition: transform 0.3s; }
-  .toggle-switch.active::after { transform: translateX(18px); background: #000; }
-  .submit-btn { width: 100%; background: var(--surface); color: var(--text-dark); border: none; padding: 14px 24px; border-radius: 100px; font-size: 15px; font-weight: 500; font-family: var(--font); cursor: pointer; margin-top: 8px; transition: opacity 0.2s ease; }
-  .submit-btn:hover { opacity: 0.9; }
-  .reset-btn { width: 100%; background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 500; font-family: var(--font); cursor: pointer; margin-top: 16px; transition: all 0.2s ease; }
-  .reset-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.2); }
-
-  .catalog-section { padding: 60px 40px; border-top: 1px solid var(--border-color); max-width: 1400px; margin: 0 auto; width: 100%; }
-  .catalog-header { margin-bottom: 32px; }
-  .catalog-title { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
-  .catalog-sort-row { display: flex; align-items: center; gap: 12px; }
-  .sort-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
-  .sort-select { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 16px; border-radius: 100px; font-size: 14px; font-family: var(--font); cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-  .sort-select option { background: #0F0F0F; color: var(--text-main); }
-  .catalog-layout { display: grid; grid-template-columns: 1fr 320px; gap: 40px; }
-  .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
-  .catalog-item { display: flex; flex-direction: column; gap: 12px; }
-  .catalog-poster-wrap { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease; aspect-ratio: 2/3; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.05); }
-  .catalog-poster-wrap:hover { transform: translateY(-4px); }
-  .catalog-poster-wrap:hover .catalog-poster-overlay { opacity: 1; }
-  .catalog-poster-wrap:hover .catalog-eye-btn, .catalog-poster-wrap:hover .catalog-save-btn { opacity: 1; }
-  .catalog-poster-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; opacity: 0.7; transition: opacity 0.3s ease; }
-  .catalog-poster-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text-main); }
-  .catalog-poster-rating { position: absolute; top: 12px; left: 12px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 100px; color: #fff; }
-  .catalog-poster-rating.high { background: linear-gradient(135deg,#22C55E 0%,#16A34A 100%); }
-  .catalog-poster-rating.medium { background: linear-gradient(135deg,#FACC15 0%,#EAB308 100%); color: #000; }
-  .catalog-poster-rating.low { background: linear-gradient(135deg,#EF4444 0%,#DC2626 100%); }
-  .catalog-eye-btn, .catalog-save-btn { position: absolute; top: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); display: flex; justify-content: center; align-items: center; cursor: pointer; color: #888; opacity: 0; transition: all 0.2s ease; z-index: 10; backdrop-filter: blur(8px); }
-  .catalog-eye-btn { right: 12px; }
-  .catalog-save-btn { right: 52px; }
-  .catalog-eye-btn:hover, .catalog-save-btn:hover, .catalog-save-btn.saved { color: #FACC15; background: rgba(250,204,21,0.15); border-color: rgba(250,204,21,0.3); }
-  .catalog-eye-btn svg, .catalog-save-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-  .catalog-meta { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
-  .catalog-meta-title { font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.3; }
-  .catalog-meta-info { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .catalog-meta-info span { display: inline-flex; align-items: center; }
-  .catalog-meta-info .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); }
+  /* --- ФИЛЬТРЫ (возвращены как на скринах 3 и 4) --- */
   .filters-panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; position: sticky; top: 90px; height: fit-content; max-height: calc(100vh - 110px); overflow-y: auto; }
   .filters-panel::-webkit-scrollbar { width: 4px; }
   .filters-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
@@ -185,17 +134,50 @@
   .filter-toggle.active::after { transform: translateX(18px); }
   .filter-content { display: none; }
   .filter-content.active { display: block; }
-  .filters-apply-btn { width: 100%; background: var(--surface); color: var(--text-dark); border: none; padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 600; font-family: var(--font); cursor: pointer; margin-top: 16px; transition: opacity 0.2s; }
+  .filters-apply-btn { width: 100%; background: var(--surface); color: var(--text-dark); border: none; padding: 14px 24px; border-radius: 100px; font-size: 14px; font-weight: 600; font-family: var(--font); cursor: pointer; margin-top: 16px; transition: opacity 0.2s; }
   .filters-apply-btn:hover { opacity: 0.9; }
   .reset-filters-btn { width: 100%; background: transparent; color: var(--text-muted); border: none; padding: 10px 24px; font-size: 13px; font-weight: 400; font-family: var(--font); cursor: pointer; margin-top: 8px; transition: all 0.2s; }
   .reset-filters-btn:hover { color: var(--text-main); }
+
+  /* Каталог (остался без изменений) */
+  .catalog-section { padding: 60px 40px; border-top: 1px solid var(--border-color); max-width: 1400px; margin: 0 auto; width: 100%; }
+  .catalog-header { margin-bottom: 32px; }
+  .catalog-title { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .catalog-sort-row { display: flex; align-items: center; gap: 12px; }
+  .sort-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+  .sort-select { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 16px; border-radius: 100px; font-size: 14px; font-family: var(--font); cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .sort-select option { background: #0F0F0F; color: var(--text-main); }
+  .catalog-layout { display: grid; grid-template-columns: 1fr 320px; gap: 40px; }
+  .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
+  .catalog-item { display: flex; flex-direction: column; gap: 12px; }
+  .catalog-poster-wrap { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease; aspect-ratio: 2/3; background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.05); }
+  .catalog-poster-wrap:hover { transform: translateY(-4px); }
+  .catalog-poster-wrap:hover .catalog-poster-overlay { opacity: 1; }
+  .catalog-poster-wrap:hover .catalog-eye-btn, .catalog-poster-wrap:hover .catalog-save-btn { opacity: 1; }
+  .catalog-poster-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; opacity: 0.7; transition: opacity 0.3s ease; }
+  .catalog-poster-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text-main); }
+  .catalog-poster-rating { position: absolute; top: 12px; left: 12px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 100px; color: #fff; }
+  .catalog-poster-rating.high { background: linear-gradient(135deg,#22C55E 0%,#16A34A 100%); }
+  .catalog-poster-rating.medium { background: linear-gradient(135deg,#FACC15 0%,#EAB308 100%); color: #000; }
+  .catalog-poster-rating.low { background: linear-gradient(135deg,#EF4444 0%,#DC2626 100%); }
+  .catalog-eye-btn, .catalog-save-btn { position: absolute; top: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); display: flex; justify-content: center; align-items: center; cursor: pointer; color: #888; opacity: 0; transition: all 0.2s ease; z-index: 10; backdrop-filter: blur(8px); }
+  .catalog-eye-btn { right: 12px; }
+  .catalog-save-btn { right: 52px; }
+  .catalog-eye-btn:hover, .catalog-save-btn:hover, .catalog-save-btn.saved { color: #FACC15; background: rgba(250,204,21,0.15); border-color: rgba(250,204,21,0.3); }
+  .catalog-eye-btn svg, .catalog-save-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .catalog-meta { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
+  .catalog-meta-title { font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.3; }
+  .catalog-meta-info { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .catalog-meta-info span { display: inline-flex; align-items: center; }
+  .catalog-meta-info .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); }
+
   @media (max-width: 900px) {
     .catalog-layout { grid-template-columns: 1fr; }
     .filters-panel { position: static; max-height: none; }
     .hero-title { font-size: 36px; }
-    .eye-modal { flex-direction: column; }
-    .eye-modal-poster { width: 100%; height: 200px; }
-    .eye-modal-content { width: 100%; }
+    .eye-modal { flex-direction: column; max-height: 90vh; }
+    .eye-modal-poster { width: 100%; height: 250px; }
+    .eye-modal-content { width: 100%; padding: 24px; }
   }
 </style>
 </head>
@@ -233,7 +215,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА СЛУЧАЙНОГО ПОДБОРА -->
+  <!-- МОДАЛКА СЛУЧАЙНОГО ПОДБОРА (не менял) -->
   <div class="overlay" id="randomAiOverlay">
     <div class="modal-window">
       <button class="modal-close" id="closeRandomAi">×</button>
@@ -289,7 +271,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ЧАТА -->
+  <!-- МОДАЛКА ЧАТА (не менял) -->
   <div class="overlay" id="chatAiOverlay">
     <div class="modal-window chat-container">
       <button class="modal-close" id="closeChatAi">×</button>
@@ -304,7 +286,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ГЛАЗА -->
+  <!-- --- ИСПРАВЛЕННАЯ МОДАЛКА ГЛАЗА (структура как на скрине 1) --- -->
   <div class="overlay" id="eyeOverlay">
     <div class="modal-window eye-modal">
       <button class="modal-close" id="eyeClose">×</button>
@@ -348,6 +330,7 @@
           <button class="filter-tab active" onclick="switchFilterTab('main', this)">Основные</button>
           <button class="filter-tab" onclick="switchFilterTab('extra', this)">Дополнительные</button>
         </div>
+        <!-- ВКЛАДКА ОСНОВНЫЕ (возвращена к скрину 3 и 4) -->
         <div id="filter-main" class="filter-content active">
           <div class="filter-section open">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
@@ -415,6 +398,7 @@
             </div>
           </div>
           <div class="filter-divider"></div>
+          <!-- Блок дополнительно с переключателями (как на скрине 3) -->
           <div class="filter-section open">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Дополнительно</span>
@@ -432,6 +416,7 @@
           <button class="filters-apply-btn" onclick="applyFilters()">Применить фильтры</button>
           <button class="reset-filters-btn" onclick="resetAllFilters()">Сбросить все фильтры</button>
         </div>
+        <!-- ВКЛАДКА ДОПОЛНИТЕЛЬНЫЕ (структура со скрина 3) -->
         <div id="filter-extra" class="filter-content">
           <div class="filter-section open">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
@@ -439,6 +424,47 @@
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="filter-section-content"><div class="checkbox-group" id="genreFilters"></div></div>
+          </div>
+          <div class="filter-divider"></div>
+          <!-- Добавлены секции со скрина 3 -->
+          <div class="filter-section">
+            <div class="filter-section-header" onclick="toggleFilterSection(this)">
+              <span class="filter-section-title">Случай</span>
+              <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-section">
+            <div class="filter-section-header" onclick="toggleFilterSection(this)">
+              <span class="filter-section-title">Сюжет и сеттинг</span>
+              <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-section">
+            <div class="filter-section-header" onclick="toggleFilterSection(this)">
+              <span class="filter-section-title">Сюжетный поворот</span>
+              <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-section">
+            <div class="filter-section-header" onclick="toggleFilterSection(this)">
+              <span class="filter-section-title">Тон и атмосфера</span>
+              <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-section">
+            <div class="filter-section-header" onclick="toggleFilterSection(this)">
+              <span class="filter-section-title">Темп</span>
+              <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="filter-section-content"><div class="checkbox-group"></div></div>
           </div>
           <div class="filter-divider"></div>
           <button class="filters-apply-btn" onclick="applyFilters()">Применить фильтры</button>
@@ -539,7 +565,6 @@
     document.getElementById('closeChatAi').addEventListener('click', () => chatAiOverlay.classList.remove('active'));
     chatAiOverlay.addEventListener('click', (e) => { if (e.target === chatAiOverlay) chatAiOverlay.classList.remove('active'); });
 
-    // ГЛАЗ: закрытие только крестиком / фоном / Esc
     document.getElementById('eyeClose').addEventListener('click', () => eyeOverlay.classList.remove('active'));
     eyeOverlay.addEventListener('click', (e) => { if (e.target === eyeOverlay) eyeOverlay.classList.remove('active'); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { eyeOverlay.classList.remove('active'); randomAiOverlay.classList.remove('active'); chatAiOverlay.classList.remove('active'); } });
@@ -570,7 +595,6 @@
 
     function toggleChip(chip) { chip.classList.toggle('active'); }
     function toggleSwitch(el) { el.classList.toggle('active'); }
-    // эксклюзивный выбор длительности (как на скрине 2)
     function selectDuration(chip) {
       document.querySelectorAll('#durationSelector .duration-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
@@ -582,7 +606,6 @@
       document.querySelectorAll('#aiFilters .toggle-switch').forEach(s => s.classList.remove('active'));
     }
 
-    // СЛУЧАЙНЫЙ ПОДБОР → открываем МОДАЛКУ ГЛАЗА (не раскрытую карточку)
     document.getElementById('generateRandomBtn').addEventListener('click', () => {
       const activeDuration = document.querySelector('#durationSelector .duration-chip.active');
       let pool = [...movieData];
@@ -618,7 +641,6 @@
     });
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') document.getElementById('sendChatBtn').click(); });
 
-    // ЧЕКБОКСЫ: preventDefault лечит двойной клик label→input
     function toggleCheckbox(el, event) {
       if (event) event.preventDefault();
       el.classList.toggle('active');
