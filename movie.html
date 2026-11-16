@@ -128,6 +128,19 @@
     }
     .movie-logline { font-size: 16px; line-height: 1.6; color: rgba(255,255,255,0.8); margin-bottom: 28px; }
 
+    /* НОВЫЙ БЛОК ИИ (перенесли сюда) */
+    .ai-recommendation-block {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.03) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.25); border-radius: var(--radius-sm); padding: 20px;
+        margin-bottom: 28px;
+    }
+    .ai-rec-header {
+        display: flex; align-items: center; gap: 10px; color: #C084FC;
+        font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+    }
+    .ai-rec-header svg { width: 16px; height: 16px; }
+    .ai-rec-text { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9); }
+
     .actions-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 32px; }
     .btn-watch {
         background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
@@ -189,17 +202,6 @@
         border-radius: var(--radius-md); 
         padding: 32px; 
     }
-
-    .ai-recommendation-block {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.03) 100%);
-        border: 1px solid rgba(168, 85, 247, 0.25); border-radius: var(--radius-sm); padding: 24px;
-    }
-    .ai-rec-header {
-        display: flex; align-items: center; gap: 10px; color: #C084FC;
-        font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;
-    }
-    .ai-rec-header svg { width: 16px; height: 16px; }
-    .ai-rec-text { font-size: 15px; line-height: 1.65; color: rgba(255,255,255,0.9); }
 
     .about-subtitle { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 14px; }
     .about-text { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.7; white-space: pre-line; }
@@ -407,7 +409,7 @@
 <script>
     var movies = [];
     var teamFilter = 'cast';
-    var similarFilter = 'mood';
+    var similarFilter = 'genre'; // Изменено по умолчанию на жанр
     var userState = { saved: {}, watched: {}, hidden: {} };
 
     try {
@@ -535,10 +537,14 @@
         if (!grid) return;
         grid.innerHTML = '';
         var similar = [];
+        
         if (similarFilter === 'mood') {
+            // Улучшенная логика: ищем совпадение хотя бы по одному слову в настроении
+            var movieMoodWords = movie.mood ? movie.mood.toLowerCase().split(/\s+/) : [];
             similar = movies.filter(function(m) {
                 if (m.id === movie.id) return false;
-                return m.mood && movie.mood && m.mood.split(' ')[0] === movie.mood.split(' ')[0];
+                var mWords = m.mood ? m.mood.toLowerCase().split(/\s+/) : [];
+                return mWords.some(function(w) { return movieMoodWords.includes(w); });
             });
         } else if (similarFilter === 'genre') {
             similar = movies.filter(function(m) {
@@ -551,6 +557,7 @@
                 return m.directors && movie.directors && m.directors[0] === movie.directors[0];
             });
         }
+
         if (!similar.length) {
             grid.innerHTML = '<div style="color:var(--text-muted);padding:40px;text-align:center;grid-column:1/-1;">Пока нет похожих фильмов в этой категории</div>';
             return;
@@ -672,6 +679,7 @@
 
         var votesText = movie.votes ? movie.votes.toLocaleString('ru-RU') + ' оценок' : 'Оценок пока нет';
 
+        // НОВАЯ СТРУКТУРА: Блок ИИ перенесен сюда, сразу после логлайна
         container.innerHTML =
             '<section class="movie-hero">' +
                 '<div class="movie-trailer-wrapper"><img src="' + (movie.trailer || movie.poster) + '" alt="' + movie.title + '">' +
@@ -680,6 +688,14 @@
                     '<h1>' + movie.title + ' <span style="color:var(--text-muted);font-weight:400;">(' + movie.year + ')</span></h1>' +
                     '<div class="movie-teaser">' + teaserHTML + '</div>' +
                     '<div class="movie-logline">' + movie.logline + '</div>' +
+                    
+                    // ВСТАВЛЕННЫЙ БЛОК ИИ
+                    '<div class="ai-recommendation-block">' +
+                        '<div class="ai-rec-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg><span>Почему стоит посмотреть</span></div>' +
+                        '<p class="ai-rec-text">' + (movie.aiRecommendation || "Этот фильм обладает уникальной атмосферой и сильным сюжетом, который не оставит вас равнодушным.") + '</p>' +
+                    '</div>' +
+                    // КОНЕЦ БЛОКА ИИ
+
                     buildActionsRow(movie) +
                     '<div class="specs">' + specsHTML + '</div>' +
                 '</div>' +
@@ -689,12 +705,6 @@
             
             '<section class="about-grid">' +
                 '<div class="about-left">' +
-                    '<div class="about-block">' +
-                        '<div class="ai-recommendation-block">' +
-                            '<div class="ai-rec-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg><span>Почему стоит посмотреть</span></div>' +
-                            '<p class="ai-rec-text">' + (movie.aiRecommendation || "Этот фильм обладает уникальной атмосферой и сильным сюжетом, который не оставит вас равнодушным.") + '</p>' +
-                        '</div>' +
-                    '</div>' +
                     '<div class="about-block">' +
                         '<h3 class="about-subtitle">Синопсис</h3>' +
                         '<p class="about-text">' + movie.synopsis + '</p>' +
@@ -725,11 +735,12 @@
                 '<div class="team-grid" id="team-grid"></div>' +
             '</section>' +
 
+            // ИЗМЕНЕННЫЙ ПОРЯДОК ФИЛЬТРОВ: Жанр теперь первый и активный по умолчанию
             '<section class="similar-section" id="similar-section">' +
                 '<h2 class="similar-title">Похожие фильмы</h2>' +
                 '<div class="similar-filters">' +
-                    '<button class="similar-filter active" data-filter="mood">По настроению</button>' +
-                    '<button class="similar-filter" data-filter="genre">По жанру</button>' +
+                    '<button class="similar-filter active" data-filter="genre">По жанру</button>' +
+                    '<button class="similar-filter" data-filter="mood">По настроению</button>' +
                     '<button class="similar-filter" data-filter="director">По режиссёру</button>' +
                 '</div>' +
                 '<div class="similar-grid" id="similar-grid"></div>' +
