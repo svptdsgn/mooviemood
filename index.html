@@ -1,535 +1,651 @@
-  <script>
-    let movieData = [];
-    let filteredMovies = [];
-    let currentIndex = 0;
-    const savedMovies = new Set();
-    const watchedMovies = new Set();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МувиМуд — Кино на вечер</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050505; --text-main:#fff; --text-muted:#888; --border:rgba(255,255,255,.1);
+  --accent:#FACC15; --purple:#A855F7; --purple-dark:#7C3AED; --green:#22C55E;
+  --radius:24px; --font:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text-main);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
 
-    function getRatingClass(rating) {
-      const num = parseFloat(rating);
-      if (num >= 7.5) return 'high';
-      if (num >= 6.0) return 'medium';
-      return 'low';
-    }
+/* HEADER */
+.header{display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;padding:0 40px;height:70px;background:rgba(5,5,5,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.logo{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.logo span{color:var(--text-muted);font-weight:400}
+.search-container{position:relative;width:100%;max-width:400px;justify-self:center}
+.search-input{width:100%;background:rgba(255,255,255,.05);border:1px solid transparent;border-radius:100px;padding:10px 20px 10px 44px;color:var(--text-main);font-size:14px;font-family:var(--font);outline:none;transition:.2s}
+.search-input:focus{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+.search-input::placeholder{color:var(--text-muted)}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:16px;height:16px;fill:none;stroke:var(--text-muted);stroke-width:2;pointer-events:none}
+.header-actions{display:flex;gap:12px;align-items:center}
+.ai-search-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(168,85,247,.1));border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center;color:#C084FC;transition:.3s;box-shadow:0 0 15px rgba(168,85,247,.2)}
+.ai-search-btn:hover{transform:scale(1.05);box-shadow:0 0 25px rgba(168,85,247,.4)}
+.ai-search-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.avatar-btn{width:40px;height:40px;border-radius:50%;background:#fff;color:#000;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center}
 
-    function createCard(data, index) {
-      const card = document.createElement('div');
-      card.className = 'movie-card';
-      card.dataset.index = index;
-      card.style.backgroundImage = `url('${data.poster}')`;
+/* CAROUSEL */
+.carousel-section{padding:48px 40px 24px;text-align:center}
+.section-label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.main-title{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+.main-mood{font-size:15px;color:var(--text-muted);margin-bottom:36px}
+.carousel-container{position:relative;max-width:1200px;margin:0 auto}
+.stage{position:relative;height:430px}
+.movie-card{position:absolute;left:50%;top:50%;width:270px;height:400px;border-radius:20px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 16px 48px rgba(0,0,0,.6);transition:transform .5s cubic-bezier(.2,.8,.2,1),width .5s,height .5s,opacity .5s,border-radius .5s;cursor:pointer}
+.movie-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.75));pointer-events:none}
+.pos-0{transform:translate(-50%,-50%) scale(1);z-index:10}
+.pos--1{transform:translate(-50%,-50%) translateX(-330px) scale(.82);z-index:5;opacity:.75}
+.pos-1{transform:translate(-50%,-50%) translateX(330px) scale(.82);z-index:5;opacity:.75}
+.pos--2{transform:translate(-50%,-50%) translateX(-580px) scale(.64);z-index:2;opacity:.35}
+.pos-2{transform:translate(-50%,-50%) translateX(580px) scale(.64);z-index:2;opacity:.35}
+.pos--3{transform:translate(-50%,-50%) translateX(-720px) scale(.5);z-index:0;opacity:0}
+.pos-3{transform:translate(-50%,-50%) translateX(720px) scale(.5);z-index:0;opacity:0}
+.rating-badge{position:absolute;top:12px;left:12px;z-index:3;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);padding:5px 10px;border-radius:8px;font-weight:700;font-size:13px}
+.rating-badge.high{color:var(--green)} .rating-badge.medium{color:var(--accent)} .rating-badge.low{color:#ff6b6b}
+.card-actions{position:absolute;top:12px;right:12px;z-index:3;display:flex;gap:8px;transition:opacity .3s}
+.card-action-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:#fff;transition:.2s}
+.card-action-btn:hover{background:rgba(255,255,255,.2)}
+.card-action-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8}
+.card-action-btn.saved{color:var(--accent)} .card-action-btn.saved svg{fill:var(--accent)}
+/* EXPANDED */
+.expanded-poster,.expanded-content{display:none}
+.movie-card.expanded{width:940px;height:540px;border-radius:24px;transform:translate(-50%,-50%) scale(1);z-index:60;display:flex;cursor:default}
+.movie-card.expanded::after{display:none}
+.movie-card.expanded .card-actions{display:none}   /* пункт 5: глаз/закладка скрыты */
+.movie-card.expanded .rating-badge{display:none}
+.movie-card.expanded .expanded-poster{display:block;width:46%;height:100%;background-size:cover;background-position:center;cursor:pointer;transition:filter .2s}
+.movie-card.expanded .expanded-poster:hover{filter:brightness(1.08)}
+.movie-card.expanded .expanded-content{display:flex;flex-direction:column;width:54%;padding:32px;background:#0d0d0d;border-left:1px solid var(--border);position:relative;text-align:left}
+.expanded-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);font-size:18px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:.2s}
+.expanded-close:hover{background:rgba(255,255,255,.15);color:#fff}
+.expanded-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;padding-right:40px}
+.expanded-mood{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+.ai-recommendation{background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(168,85,247,.03));border:1px solid rgba(168,85,247,.25);border-radius:16px;padding:20px;flex:1;display:flex;flex-direction:column;min-height:0}
+.ai-label{display:flex;align-items:center;gap:8px;color:#C084FC;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.ai-label svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.expanded-desc{font-size:14px;line-height:1.6;color:rgba(255,255,255,.85);flex:1;overflow-y:auto;max-height:300px;padding-right:10px}  /* пункт 4: скролл */
+.expanded-desc::-webkit-scrollbar{width:5px}
+.expanded-desc::-webkit-scrollbar-thumb{background:rgba(168,85,247,.5);border-radius:10px}
+.expanded-desc::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}
+.expanded-watch{margin-top:16px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s}
+.expanded-watch:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(168,85,247,.45)}
+.carousel-container.has-expanded .nav-btn{opacity:0;pointer-events:none}
+.nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:#fff;font-size:20px;z-index:70;display:flex;align-items:center;justify-content:center;transition:.2s}
+.nav-btn:hover{background:rgba(255,255,255,.14)}
+#prevBtn{left:0} #nextBtn{right:0}
 
-      const ratingClass = getRatingClass(data.rating);
-      const isSaved = savedMovies.has(index);
+/* CATALOG */
+.catalog-section{max-width:1200px;margin:0 auto;padding:24px 40px 80px}
+.catalog-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+.catalog-title{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.sort-select{background:rgba(255,255,255,.06);border:1px solid var(--border);color:#fff;border-radius:100px;padding:9px 18px;font-size:13px;font-family:var(--font);outline:none;cursor:pointer}
+.catalog-layout{display:grid;grid-template-columns:280px 1fr;gap:32px;align-items:start}
+.filters-panel{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:sticky;top:90px}
+.filter-tabs{display:flex;background:rgba(255,255,255,.05);border-radius:100px;padding:4px;margin-bottom:20px}
+.filter-tab{flex:1;padding:8px;border-radius:100px;font-size:13px;font-weight:600;color:var(--text-muted);transition:.2s}
+.filter-tab.active{background:#fff;color:#000}
+.filter-content{display:none}
+.filter-content.active{display:block}
+.filter-group{margin-bottom:18px}
+.filter-group.open .filter-options{display:block}
+.filter-group-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding:6px 0}
+.filter-group-head svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s}
+.filter-group.open .filter-group-head svg{transform:rotate(180deg)}
+.filter-options{display:none;gap:8px;margin-top:8px}
+.checkbox-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:13px;cursor:pointer;transition:.15s;user-select:none}
+.checkbox-item:hover{background:rgba(255,255,255,.08)}
+.checkbox-item input{position:absolute;opacity:0;pointer-events:none}
+.checkbox-mark{width:18px;height:18px;border-radius:6px;border:1.5px solid var(--text-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+.checkbox-mark svg{width:12px;height:12px;fill:none;stroke:#000;stroke-width:3;opacity:0;transition:.15s}
+.checkbox-item.active{border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.08)}
+.checkbox-item.active .checkbox-mark{background:var(--accent);border-color:var(--accent)}
+.checkbox-item.active .checkbox-mark svg{opacity:1}
+.filter-toggle-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:13px;border-bottom:1px solid var(--border)}
+.filter-toggle-item:last-child{border-bottom:none}
+.filter-toggle{width:42px;height:24px;border-radius:100px;background:rgba(255,255,255,.12);position:relative;transition:.2s;flex-shrink:0}
+.filter-toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.filter-toggle.active{background:var(--purple)}
+.filter-toggle.active::after{left:21px}
+.filter-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.btn-apply{height:46px;border-radius:12px;background:#fff;color:#000;font-weight:700;font-size:14px;transition:.2s}
+.btn-apply:hover{transform:translateY(-2px)}
+.btn-reset{height:42px;border-radius:100px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:13px;transition:.2s}
+.btn-reset:hover{border-color:rgba(255,255,255,.3);color:#fff}
+.catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:22px}
+.catalog-item{cursor:pointer}
+.catalog-poster-wrap{position:relative;aspect-ratio:2/3;border-radius:14px;background-size:cover;background-position:center;overflow:hidden;transition:transform .2s}
+.catalog-item:hover .catalog-poster-wrap{transform:translateY(-4px)}
+.catalog-poster-rating{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 9px;border-radius:8px;font-weight:700;font-size:12px}
+.catalog-poster-rating.high{color:var(--green)} .catalog-poster-rating.medium{color:var(--accent)} .catalog-poster-rating.low{color:#ff6b6b}
+.catalog-save-btn,.catalog-eye-btn{position:absolute;top:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;color:#fff;opacity:0;transition:.2s;z-index:2}
+.catalog-save-btn{right:10px} .catalog-eye-btn{right:48px}
+.catalog-item:hover .catalog-save-btn,.catalog-item:hover .catalog-eye-btn{opacity:1}
+.catalog-save-btn.saved{opacity:1;color:var(--accent)} .catalog-save-btn.saved svg{fill:var(--accent)}
+.catalog-save-btn svg,.catalog-eye-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8}
+.catalog-poster-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.85));display:flex;align-items:flex-end;padding:14px;opacity:0;transition:.2s}
+.catalog-item:hover .catalog-poster-overlay{opacity:1}
+.catalog-poster-title{font-size:14px;font-weight:700}
+.catalog-meta{margin-top:10px}
+.catalog-meta-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.catalog-meta-info{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+.catalog-meta-info .dot{width:3px;height:3px;border-radius:50%;background:var(--text-muted)}
 
-      card.innerHTML = `
-        <div class="rating-badge ${ratingClass}">${data.rating}</div>
-        <div class="card-actions">
-          <button class="card-action-btn save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave(${index}, event)" title="Сохранить">
-            <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-          </button>
-          <button class="card-action-btn" onclick="expandCard(${index}, event)" title="Подробнее">
-            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          </button>
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.overlay.active{display:flex}
+.modal{background:#0d0d0d;border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:32px;position:relative}
+.modal::-webkit-scrollbar{width:6px}.modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:10px}
+.modal-close{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text-muted);font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.modal-close:hover{background:rgba(255,255,255,.15);color:#fff}
+.modal h2{font-size:24px;font-weight:800;margin-bottom:8px;padding-right:40px}
+.modal p.sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.5}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.option-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:9px 16px;font-size:13px;font-weight:500;transition:.2s}
+.option-chip:hover{border-color:rgba(255,255,255,.3)}
+.option-chip.active{background:#fff;color:#000;border-color:#fff}
+.modal-label{font-size:13px;font-weight:600;color:var(--text-muted);margin:18px 0 10px}
+.duration-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:9px 16px;font-size:13px;transition:.2s}
+.duration-chip.active{background:#fff;color:#000;border-color:#fff}
+.btn-generate{width:100%;height:50px;border-radius:100px;background:#fff;color:#000;font-weight:700;font-size:15px;margin-top:24px;transition:.2s}
+.btn-generate:hover{transform:translateY(-2px)}
+.btn-reset-filters{width:100%;height:44px;border-radius:100px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:13px;margin-top:10px}
+/* CHAT */
+.chat-messages{min-height:120px;max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.message{padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.5;max-width:85%}
+.message.user{align-self:flex-end;background:var(--purple);color:#fff}
+.message.ai{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid var(--border)}
+.chat-input-row{display:flex;gap:10px}
+.chat-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:100px;padding:12px 18px;color:#fff;font-size:14px;font-family:var(--font);outline:none}
+.chat-send{width:46px;height:46px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+/* EYE MODAL (пункт 5: только крестик) */
+.eye-modal{max-width:860px;padding:0;overflow:hidden}
+.eye-body{display:grid;grid-template-columns:340px 1fr;min-height:480px}
+.eye-poster{background-size:cover;background-position:center}
+.eye-info{padding:32px;display:flex;flex-direction:column;position:relative}
+.eye-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--border);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:5;transition:.2s}
+.eye-close:hover{background:rgba(255,255,255,.18)}
+.eye-title{font-size:28px;font-weight:800;margin-bottom:14px;padding-right:44px}
+.eye-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.eye-badge{background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600}
+.eye-badge.rating.high{color:var(--green)} .eye-badge.rating.medium{color:var(--accent)} .eye-badge.rating.low{color:#ff6b6b}
+.eye-text{font-size:14px;line-height:1.65;color:rgba(255,255,255,.85);flex:1;max-height:240px;overflow-y:auto;padding-right:10px;margin-bottom:20px}
+.eye-text::-webkit-scrollbar{width:5px}.eye-text::-webkit-scrollbar-thumb{background:rgba(168,85,247,.5);border-radius:10px}
+.btn-watch{height:52px;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:9px;transition:.2s}
+.btn-watch:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(168,85,247,.45)}
+.btn-watch svg{width:17px;height:17px;fill:currentColor}
+
+.footer{border-top:1px solid var(--border);padding:40px;text-align:center;color:var(--text-muted);font-size:14px}
+@media(max-width:900px){
+  .header{grid-template-columns:auto auto}.search-container{display:none}
+  .catalog-layout{grid-template-columns:1fr}.filters-panel{position:static}
+  .movie-card.expanded{width:94vw;height:auto;flex-direction:column}
+  .movie-card.expanded .expanded-poster{width:100%;height:280px}
+  .movie-card.expanded .expanded-content{width:100%}
+  .eye-body{grid-template-columns:1fr}.eye-poster{height:280px}
+  .pos--1,.pos-1{transform:translate(-50%,-50%) translateX(±240px) scale(.8)}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo">Муви<span>Муд</span></a>
+  <div class="search-container">
+    <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" class="search-input" placeholder="Фильмы, сериалы, персоны...">
+  </div>
+  <div class="header-actions">
+    <button class="ai-search-btn" id="openChatAiBtn" title="Поиск по ИИ"><svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg></button>
+    <button class="avatar-btn">А</button>
+  </div>
+</header>
+
+<section class="carousel-section">
+  <div class="section-label">Вам может понравиться</div>
+  <h1 class="main-title" id="mainTitle">—</h1>
+  <div class="main-mood" id="mainMood">—</div>
+  <div class="carousel-container" id="carouselContainer">
+    <button class="nav-btn" id="prevBtn">‹</button>
+    <div class="stage" id="stage"></div>
+    <button class="nav-btn" id="nextBtn">›</button>
+  </div>
+  <button class="btn-generate" id="openRandomAiBtn" style="max-width:280px;margin:28px auto 0">Подобрать случайно</button>
+</section>
+
+<section class="catalog-section">
+  <div class="catalog-head">
+    <h2 class="catalog-title">Все фильмы</h2>
+    <select class="sort-select" id="sortSelect">
+      <option value="default">Сортировать: По соответствию</option>
+      <option value="rating">По рейтингу</option>
+      <option value="year">По новизне</option>
+      <option value="votes">По популярности</option>
+    </select>
+  </div>
+  <div class="catalog-layout">
+    <aside class="filters-panel">
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="switchFilterTab('main',this)">Основные</button>
+        <button class="filter-tab" onclick="switchFilterTab('extra',this)">Дополнительные</button>
+      </div>
+      <div class="filter-content active" id="filter-main">
+        <div class="filter-group open" id="countryGroup">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Страна
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" id="countryFilters"></div>
         </div>
-        <div class="expanded-poster" style="background-image: url('${data.poster}')"></div>
-        <div class="expanded-content">
-            <button class="expanded-close" onclick="collapseCard(event)" title="Закрыть">×</button>
-            <h2 class="expanded-title">${data.title}</h2>
-            <div class="expanded-mood">${data.mood}</div>
-            <div class="ai-recommendation">
-                <div class="ai-label">
-                    <svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg>
-                    ПОЧЕМУ ВАМ СТОИТ ПОСМОТРЕТЬ
-                </div>
-                <p class="expanded-desc">${data.whyWatch || 'Этот фильм обладает уникальной атмосферой и сильным сюжетом.'}</p>
-            </div>
+        <div class="filter-group">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Год выхода
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" id="yearFilters">
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="before2000"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>До 2000</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="2000to2010"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>2000–2010</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="2010to2020"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>2010–2020</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="after2020"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>После 2020</label>
+          </div>
         </div>
-      `;
-
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.card-action-btn') || e.target.closest('.expanded-close') || card.classList.contains('expanded')) return;
-        if (currentIndex !== index) {
-          currentIndex = index;
-          updateCarousel();
-        }
-      });
-
-      return card;
-    }
-
-    function toggleSave(index, e) {
-      e.stopPropagation();
-      if (savedMovies.has(index)) savedMovies.delete(index);
-      else savedMovies.add(index);
-      const cards = stage.querySelectorAll('.movie-card');
-      cards.forEach(c => {
-        if (parseInt(c.dataset.index) === index) {
-          const btn = c.querySelector('.save-btn');
-          if (btn) btn.classList.toggle('saved');
-        }
-      });
-    }
-
-    function initCarousel() {
-      stage.innerHTML = '';
-      for (let i = -2; i <= 2; i++) {
-        let dataIndex = (currentIndex + i + movieData.length) % movieData.length;
-        let card = createCard(movieData[dataIndex], currentIndex + i);
-        stage.appendChild(card);
-      }
-      updateCarousel();
-    }
-
-    function updateCarousel() {
-      const cards = stage.querySelectorAll('.movie-card');
-      if (stage.querySelector('.expanded')) return;
-
-      cards.forEach((card) => {
-        let diff = parseInt(card.dataset.index) - currentIndex;
-        card.classList.remove('pos-0', 'pos--1', 'pos-1', 'pos--2', 'pos-2', 'pos--3', 'pos-3');
-        
-        if (diff === 0) card.classList.add('pos-0');
-        else if (diff === -1) card.classList.add('pos--1');
-        else if (diff === 1) card.classList.add('pos-1');
-        else if (diff === -2) card.classList.add('pos--2');
-        else if (diff === 2) card.classList.add('pos-2');
-        else if (diff < -2) card.classList.add('pos--3');
-        else if (diff > 2) card.classList.add('pos-3');
-      });
-
-      let mainDataIndex = (currentIndex + movieData.length) % movieData.length;
-      document.getElementById('mainTitle').textContent = movieData[mainDataIndex].title;
-      document.getElementById('mainMood').textContent = movieData[mainDataIndex].mood;
-    }
-
-    function expandCard(index, e) {
-      e.stopPropagation();
-      const cards = stage.querySelectorAll('.movie-card');
-      let targetCard = null;
-      cards.forEach(c => { if (parseInt(c.dataset.index) === index) targetCard = c; });
-      if (targetCard) {
-        targetCard.classList.add('expanded');
-        carouselContainer.classList.add('has-expanded');
-        stage.classList.add('has-expanded');
-      }
-    }
-
-    function collapseCard(e) {
-      e.stopPropagation();
-      const expandedCard = stage.querySelector('.expanded');
-      if (expandedCard) {
-        expandedCard.classList.remove('expanded');
-        carouselContainer.classList.remove('has-expanded');
-        stage.classList.remove('has-expanded');
-      }
-    }
-
-    document.getElementById('prevBtn').addEventListener('click', () => {
-      currentIndex = (currentIndex - 1 + movieData.length) % movieData.length;
-      initCarousel();
-    });
-
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      currentIndex = (currentIndex + 1) % movieData.length;
-      initCarousel();
-    });
-
-    const randomAiOverlay = document.getElementById('randomAiOverlay');
-    const chatAiOverlay = document.getElementById('chatAiOverlay');
-    const eyeOverlay = document.getElementById('eyeOverlay');
-
-    document.getElementById('openRandomAiBtn').addEventListener('click', () => randomAiOverlay.classList.add('active'));
-    document.getElementById('closeRandomAi').addEventListener('click', () => { randomAiOverlay.classList.remove('active'); resetToFilters(); });
-    randomAiOverlay.addEventListener('click', (e) => { if (e.target === randomAiOverlay) { randomAiOverlay.classList.remove('active'); resetToFilters(); } });
-
-    document.getElementById('openChatAiBtn').addEventListener('click', () => {
-      chatAiOverlay.classList.add('active');
-      document.getElementById('chatInput').focus();
-    });
-    document.getElementById('closeChatAi').addEventListener('click', () => chatAiOverlay.classList.remove('active'));
-    chatAiOverlay.addEventListener('click', (e) => { if (e.target === chatAiOverlay) chatAiOverlay.classList.remove('active'); });
-
-    // Обработчик закрытия глазной модалки (только крестик)
-    document.getElementById('eyeClose').addEventListener('click', () => eyeOverlay.classList.remove('active'));
-    eyeOverlay.addEventListener('click', (e) => { if (e.target === eyeOverlay) eyeOverlay.classList.remove('active'); });
-    
-    document.getElementById('eyeWatchBtn').addEventListener('click', () => {
-      const movieId = document.getElementById('eyeWatchBtn').dataset.movieId;
-      if (movieId) window.location.href = 'movie.html?id=' + movieId;
-    });
-
-    function showEyeModal(index) {
-      const movie = movieData[index];
-      const ratingClass = getRatingClass(movie.rating);
-      
-      document.getElementById('eyePoster').style.backgroundImage = `url('${movie.poster}')`;
-      document.getElementById('eyeTitle').textContent = movie.title;
-      // Ограничиваем текст 800 символами
-      let text = movie.whyWatch || 'Этот фильм обладает уникальной атмосферой и сильным сюжетом.';
-      if (text.length > 800) text = text.substring(0, 800) + '...';
-      document.getElementById('eyeText').textContent = text;
-      document.getElementById('eyeWatchBtn').dataset.movieId = movie.id;
-      
-      const badgesHtml = `
-        <span class="eye-badge rating ${ratingClass}">★ ${movie.rating}</span>
-        <span class="eye-badge">${movie.year}</span>
-        <span class="eye-badge">${movie.runtime} мин</span>
-        <span class="eye-badge">${movie.country}</span>
-        <span class="eye-badge">${movie.age}</span>
-        <span class="eye-badge">${movie.format}</span>
-      `;
-      document.getElementById('eyeBadges').innerHTML = badgesHtml;
-      
-      eyeOverlay.classList.add('active');
-    }
-
-    function toggleChip(chip) { chip.classList.toggle('active'); }
-    function toggleSwitch(el) { el.classList.toggle('active'); }
-    function toggleDuration(chip) { chip.classList.toggle('active'); }
-    
-    function resetFilters() {
-      document.querySelectorAll('.option-chip').forEach(chip => chip.classList.remove('active'));
-      document.querySelectorAll('.duration-chip').forEach(chip => chip.classList.remove('active'));
-      document.querySelectorAll('.toggle-switch').forEach(sw => sw.classList.remove('active'));
-    }
-
-    function resetToFilters() {
-      document.getElementById('aiFilters').style.display = 'block';
-      document.getElementById('aiResults').style.display = 'none';
-    }
-
-    // ЛОГИКА СЛУЧАЙНОГО ПОДБОРА (учитывает продолжительность)
-    document.getElementById('generateRandomBtn').addEventListener('click', () => {
-      randomAiOverlay.classList.remove('active');
-      resetToFilters();
-      
-      // Фильтруем по выбранной продолжительности
-      const activeDuration = document.querySelector('.duration-chip.active');
-      let filteredForRandom = [...movieData];
-      
-      if (activeDuration) {
-        const text = activeDuration.textContent.trim();
-        if (text === '< 90 мин') {
-          filteredForRandom = filteredForRandom.filter(m => m.runtime < 90);
-        } else if (text === '90-120 мин') {
-          filteredForRandom = filteredForRandom.filter(m => m.runtime >= 90 && m.runtime <= 120);
-        } else if (text === '> 120 мин') {
-          filteredForRandom = filteredForRandom.filter(m => m.runtime > 120);
-        }
-      }
-      
-      if (filteredForRandom.length === 0) {
-        alert("По выбранным параметрам ничего не найдено.");
-        return;
-      }
-      
-      // Берем случайный фильм из отфильтрованных
-      const randomMovie = filteredForRandom[Math.floor(Math.random() * filteredForRandom.length)];
-      const idx = movieData.findIndex(m => m.id === randomMovie.id);
-      
-      currentIndex = idx;
-      initCarousel();
-      
-      setTimeout(() => {
-        const cards = stage.querySelectorAll('.movie-card');
-        const centerCard = cards[2];
-        if (centerCard) {
-          centerCard.classList.add('expanded');
-          carouselContainer.classList.add('has-expanded');
-          stage.classList.add('has-expanded');
-        }
-      }, 400);
-    });
-
-    function resetAiSearch() {
-      document.getElementById('aiFilters').style.display = 'block';
-      document.getElementById('aiResults').style.display = 'none';
-    }
-
-    function toggleAiDesc(header) {
-      const desc = header.nextElementSibling;
-      const isOpen = desc.classList.contains('open');
-      document.querySelectorAll('.result-ai-desc').forEach(d => d.classList.remove('open'));
-      if (!isOpen) desc.classList.add('open');
-    }
-
-    const chatInput = document.getElementById('chatInput');
-    const chatMessages = document.getElementById('chatMessages');
-    
-    function addMessage(text, isUser) {
-      const msg = document.createElement('div');
-      msg.className = `message ${isUser ? 'user' : 'ai'}`;
-      msg.textContent = text;
-      chatMessages.appendChild(msg);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    document.getElementById('sendChatBtn').addEventListener('click', () => {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      addMessage(text, true);
-      chatInput.value = '';
-      setTimeout(() => {
-        addMessage("Отличный запрос! Исходя из вашего описания, я рекомендую обратить внимание на фильм «Седьмая печать» или «Пожары». Хотите, я расскажу подробнее о сюжете одного из них?", false);
-      }, 800);
-    });
-
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') document.getElementById('sendChatBtn').click();
-    });
-
-    // ЛОГИКА ЧЕКБОКСОВ
-    function toggleCheckbox(el) {
-      el.classList.toggle('active');
-      applyFilters();
-    }
-
-    // КАТАЛОГ И ФИЛЬТРАЦИЯ
-    function renderCatalog(movies = movieData) {
-      const grid = document.getElementById('catalogGrid');
-      grid.innerHTML = '';
-      
-      if (movies.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-muted);">Фильмы не найдены. Попробуйте изменить фильтры.</div>';
-        return;
-      }
-      
-      movies.forEach((movie, idx) => {
-        const originalIdx = movieData.findIndex(m => m.id === movie.id);
-        const ratingClass = getRatingClass(movie.rating);
-        const isSaved = savedMovies.has(originalIdx);
-        
-        const item = document.createElement('div');
-        item.className = 'catalog-item';
-        
-        item.innerHTML = `
-          <div class="catalog-poster-wrap" style="background-image: url('${movie.poster}')" data-idx="${originalIdx}">
-            <div class="catalog-poster-rating ${ratingClass}">${movie.rating}</div>
-            <button class="catalog-save-btn ${isSaved ? 'saved' : ''}" data-save-idx="${originalIdx}" title="Сохранить на потом">
-              <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-            </button>
-            <button class="catalog-eye-btn" data-eye-idx="${originalIdx}" title="Почему стоит посмотреть">
-              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-            <div class="catalog-poster-overlay">
-              <div class="catalog-poster-title">${movie.title}</div>
-            </div>
+        <div class="filter-group">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Продолжительность
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" id="runtimeFilters">
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="short"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>До 90 минут</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="medium"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>90–120 минут</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="long"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Больше 2 часов</label>
           </div>
-          <div class="catalog-meta">
-            <div class="catalog-meta-title">${movie.title}</div>
-            <div class="catalog-meta-info">
-              <span>${movie.year}</span>
-              <span class="dot"></span>
-              <span>${movie.runtime} мин</span>
-              <span class="dot"></span>
-              <span>${movie.country}</span>
-            </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Рейтинг
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" id="ratingFilters">
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="high"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>8.0 и выше</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="medium"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>7.0–7.9</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="low"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Ниже 7.0</label>
           </div>
-        `;
-        
-        grid.appendChild(item);
-      });
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Возраст
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" id="ageFilters">
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="6+"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>6+</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="12+"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>12+</label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)"><input type="checkbox" value="18+"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>18+</label>
+          </div>
+        </div>
+      </div>
+      <div class="filter-content" id="filter-extra">
+        <div class="filter-group open">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Жанры
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" id="genreFilters"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-head" onclick="toggleFilterSection(this)">Дополнительно
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+          <div class="filter-options" style="display:block">
+            <div class="filter-toggle-item"><span>Можно с детьми</span><div class="filter-toggle" onclick="toggleFilterSwitch(this)"></div></div>
+            <div class="filter-toggle-item"><span>Убрать просмотренные</span><div class="filter-toggle" id="hideWatchedToggle" onclick="toggleFilterSwitch(this)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-apply" onclick="applyFilters()">Применить фильтры</button>
+        <button class="btn-reset" onclick="resetAllFilters()">Сбросить все фильтры</button>
+      </div>
+    </aside>
+    <div class="catalog-grid" id="catalogGrid"></div>
+  </div>
+</section>
 
-      grid.querySelectorAll('.catalog-save-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const idx = parseInt(btn.dataset.saveIdx);
-          if (savedMovies.has(idx)) savedMovies.delete(idx);
-          else savedMovies.add(idx);
-          btn.classList.toggle('saved');
-        });
-      });
+<!-- RANDOM OVERLAY -->
+<div class="overlay" id="randomAiOverlay">
+  <div class="modal">
+    <button class="modal-close" id="closeRandomAi">×</button>
+    <h2>Подберём под настроение</h2>
+    <p class="sub">Иногда фильм находит нас сам. Выберите параметры — и мы покажем, что стоит включить.</p>
+    <div id="aiFilters">
+      <div class="modal-label">Настроение</div>
+      <div class="chip-row">
+        <button class="option-chip" onclick="toggleChip(this)">😢 Грустное</button>
+        <button class="option-chip" onclick="toggleChip(this)">😄 Весёлое</button>
+        <button class="option-chip" onclick="toggleChip(this)">🔮 Мистичное</button>
+        <button class="option-chip" onclick="toggleChip(this)">😰 Тревожное</button>
+        <button class="option-chip" onclick="toggleChip(this)">💕 Романтичное</button>
+      </div>
+      <div class="modal-label">Формат</div>
+      <div class="chip-row">
+        <button class="option-chip" onclick="toggleChip(this)">🎬 Фильм</button>
+        <button class="option-chip" onclick="toggleChip(this)">🎨 Мультфильм</button>
+        <button class="option-chip" onclick="toggleChip(this)">📄 Документальный</button>
+      </div>
+      <div class="modal-label">Продолжительность</div>
+      <div class="chip-row" id="durationRow">
+        <button class="duration-chip active" onclick="selectDuration(this)">Любая</button>
+        <button class="duration-chip" onclick="selectDuration(this)">&lt; 90 мин</button>
+        <button class="duration-chip" onclick="selectDuration(this)">90-120 мин</button>
+        <button class="duration-chip" onclick="selectDuration(this)">&gt; 120 мин</button>
+      </div>
+      <button class="btn-generate" id="generateRandomBtn">Показать фильм</button>
+      <button class="btn-reset-filters" onclick="resetRandomFilters()">↺ Сбросить фильтры</button>
+    </div>
+  </div>
+</div>
 
-      grid.querySelectorAll('.catalog-eye-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const idx = parseInt(btn.dataset.eyeIdx);
-          showEyeModal(idx);
-        });
-      });
+<!-- CHAT OVERLAY -->
+<div class="overlay" id="chatAiOverlay">
+  <div class="modal">
+    <button class="modal-close" id="closeChatAi">×</button>
+    <h2>Подбор по описанию</h2>
+    <p class="sub">Привет! Опишите, что хотите посмотреть. Например: «хочу что-то лёгкое на вечер».</p>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Ваш запрос...">
+      <button class="chat-send" id="sendChatBtn">→</button>
+    </div>
+  </div>
+</div>
 
-      grid.querySelectorAll('.catalog-poster-wrap').forEach(wrap => {
-        wrap.addEventListener('click', (e) => {
-          if (e.target.closest('.catalog-eye-btn') || e.target.closest('.catalog-save-btn')) return;
-          const idx = parseInt(wrap.dataset.idx);
-          const movie = movieData[idx];
-          window.location.href = 'movie.html?id=' + movie.id;
-        });
-      });
-    }
+<!-- EYE OVERLAY (только крестик) -->
+<div class="overlay" id="eyeOverlay">
+  <div class="modal eye-modal">
+    <div class="eye-body">
+      <div class="eye-poster" id="eyePoster"></div>
+      <div class="eye-info">
+        <button class="eye-close" id="eyeClose">×</button>
+        <h2 class="eye-title" id="eyeTitle"></h2>
+        <div class="eye-badges" id="eyeBadges"></div>
+        <div class="ai-recommendation" style="flex:1">
+          <div class="ai-label"><svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg>ПОЧЕМУ СТОИТ ПОСМОТРЕТЬ</div>
+          <p class="eye-text" id="eyeText"></p>
+        </div>
+        <a class="btn-watch" id="eyeWatchBtn" href="#"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Смотреть</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-    function renderCountryFilters() {
-      const countries = [...new Set(movieData.map(m => m.country))].sort(); // Сортировка по алфавиту
-      const container = document.getElementById('countryFilters');
-      container.innerHTML = '';
-      countries.forEach(country => {
-        const label = document.createElement('label');
-        label.className = 'checkbox-item';
-        label.setAttribute('onclick', 'toggleCheckbox(this)');
-        label.innerHTML = `
-          <input type="checkbox" value="${country}">
-          <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-          ${country}
-        `;
-        container.appendChild(label);
-      });
-    }
+<footer class="footer">МувиМуд. Прототип. 2026</footer>
 
-    function renderGenreFilters() {
-      const allGenres = new Set();
-      movieData.forEach(m => m.genres.forEach(g => allGenres.add(g)));
-      const container = document.getElementById('genreFilters');
-      container.innerHTML = '';
-      Array.from(allGenres).sort().forEach(genre => { // Сортировка по алфавиту
-        const label = document.createElement('label');
-        label.className = 'checkbox-item';
-        label.setAttribute('onclick', 'toggleCheckbox(this)');
-        label.innerHTML = `
-          <input type="checkbox" value="${genre}">
-          <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-          ${genre}
-        `;
-        container.appendChild(label);
-      });
-    }
+<script>
+/* ==== ПУТИ К ПОСТЕРАМ (соответствие реальным файлам) ==== */
+const POSTER_MAP = {
+  6553389:'posters/volna.jpg', 1040690:'posters/seredina.jpg', 714248:'posters/pesn.jpg',
+  425:'posters/pechat.jpg', 425400:'posters/pozhari.jpg', 5237750:'posters/ivan.jpg',
+  225011:'posters/izgnanie.jpg', 1259195:'posters/iskustv.jpg', 1347315:'posters/knogo.jpg',
+  677566:'posters/velikaya.jpg'
+};
 
-    function setupCheckboxHandlers() {
-      // Больше не нужно, так как onclick прописан в HTML
-    }
+let movieData = [], filteredMovies = [], currentIndex = 0;
+const savedMovies = new Set();
+const watchedMovies = new Set();
 
-    function applyFilters() {
-      let filtered = [...movieData];
-      
-      // Страна
-      const selectedCountries = [...document.querySelectorAll('#countryFilters .checkbox-item.active input')].map(cb => cb.value);
-      if (selectedCountries.length > 0) {
-        filtered = filtered.filter(m => selectedCountries.includes(m.country));
-      }
-      
-      // Год
-      const selectedYears = [...document.querySelectorAll('#yearFilters .checkbox-item.active input')].map(cb => cb.value);
-      if (selectedYears.length > 0) {
-        filtered = filtered.filter(m => {
-          if (selectedYears.includes('before2000') && m.year < 2000) return true;
-          if (selectedYears.includes('2000to2010') && m.year >= 2000 && m.year <= 2010) return true;
-          if (selectedYears.includes('2010to2020') && m.year > 2010 && m.year <= 2020) return true;
-          if (selectedYears.includes('after2020') && m.year > 2020) return true;
-          return false;
-        });
-      }
-      
-      // Продолжительность
-      const selectedRuntimes = [...document.querySelectorAll('#runtimeFilters .checkbox-item.active input')].map(cb => cb.value);
-      if (selectedRuntimes.length > 0) {
-        filtered = filtered.filter(m => {
-          if (selectedRuntimes.includes('short') && m.runtime < 90) return true;
-          if (selectedRuntimes.includes('medium') && m.runtime >= 90 && m.runtime <= 120) return true;
-          if (selectedRuntimes.includes('long') && m.runtime > 120) return true;
-          return false;
-        });
-      }
-      
-      // Рейтинг
-      const selectedRatings = [...document.querySelectorAll('#ratingFilters .checkbox-item.active input')].map(cb => cb.value);
-      if (selectedRatings.length > 0) {
-        filtered = filtered.filter(m => {
-          const rating = parseFloat(m.rating);
-          if (selectedRatings.includes('high') && rating >= 8.0) return true;
-          if (selectedRatings.includes('medium') && rating >= 7.0 && rating < 8.0) return true;
-          if (selectedRatings.includes('low') && rating < 7.0) return true;
-          return false;
-        });
-      }
-      
-      // Возраст
-      const selectedAges = [...document.querySelectorAll('#ageFilters .checkbox-item.active input')].map(cb => cb.value);
-      if (selectedAges.length > 0) {
-        filtered = filtered.filter(m => selectedAges.includes(m.age));
-      }
-      
-      // Жанры
-      const selectedGenres = [...document.querySelectorAll('#genreFilters .checkbox-item.active input')].map(cb => cb.value);
-      if (selectedGenres.length > 0) {
-        filtered = filtered.filter(m => 
-          m.genres && m.genres.some(g => selectedGenres.includes(g))
-        );
-      }
-      
-      // Убрать просмотренные
-      const hideWatched = document.querySelector('.filter-toggle-item:last-child .filter-toggle').classList.contains('active');
-      if (hideWatched) {
-        filtered = filtered.filter(m => !watchedMovies.has(m.id));
-      }
+/* состояние из movie.html (localStorage) */
+try {
+  const st = JSON.parse(localStorage.getItem('mv_user_state') || '{}');
+  Object.keys(st.watched || {}).forEach(id => watchedMovies.add(Number(id)));
+  const sv = JSON.parse(localStorage.getItem('mv_saved') || '[]');
+  sv.forEach(i => savedMovies.add(i));
+} catch(e){}
+function persistSaved(){ try{ localStorage.setItem('mv_saved', JSON.stringify([...savedMovies])); }catch(e){} }
 
-      filteredMovies = filtered;
-      renderCatalog(filtered);
-    }
+function getRatingClass(r){ const n=parseFloat(r); return n>=7.5?'high':n>=6?'medium':'low'; }
 
-    function resetAllFilters() {
-      document.querySelectorAll('.checkbox-item').forEach(item => {
-        item.classList.remove('active');
-        const input = item.querySelector('input');
-        if (input) input.checked = false;
-      });
-      document.querySelectorAll('.filter-toggle').forEach(toggle => toggle.classList.remove('active'));
-      filteredMovies = [...movieData];
-      renderCatalog();
-    }
+const stage=document.getElementById('stage'), carouselContainer=document.getElementById('carouselContainer');
 
-    function switchFilterTab(tab, btn) {
-      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.filter-content').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(`filter-${tab}`).classList.add('active');
-    }
+function createCard(data,index){
+  const card=document.createElement('div');
+  card.className='movie-card'; card.dataset.index=index;
+  card.style.backgroundImage=`url('${data.poster}')`;
+  const rc=getRatingClass(data.rating), isSaved=savedMovies.has(index);
+  card.innerHTML=`
+    <div class="rating-badge ${rc}">${data.rating}</div>
+    <div class="card-actions">
+      <button class="card-action-btn save-btn ${isSaved?'saved':''}" onclick="toggleSave(${index},event)" title="Сохранить">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+      <button class="card-action-btn" onclick="expandCard(${index},event)" title="Подробнее">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+    </div>
+    <div class="expanded-poster" style="background-image:url('${data.poster}')" title="Открыть страницу фильма"></div>
+    <div class="expanded-content">
+      <button class="expanded-close" onclick="collapseCard(event)" title="Закрыть">×</button>
+      <h2 class="expanded-title">${data.title}</h2>
+      <div class="expanded-mood">${data.mood}</div>
+      <div class="ai-recommendation">
+        <div class="ai-label"><svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg>ПОЧЕМУ ВАМ СТОИТ ПОСМОТРЕТЬ</div>
+        <p class="expanded-desc">${data.whyWatch}</p>
+      </div>
+      <a class="expanded-watch" href="movie.html?id=${data.id}">Смотреть</a>
+    </div>`;
+  /* клик по постеру раскрытой карточки → страница фильма (пункт: некликабельно) */
+  card.querySelector('.expanded-poster').addEventListener('click',e=>{e.stopPropagation();window.location.href='movie.html?id='+data.id;});
+  card.addEventListener('click',e=>{
+    if(card.classList.contains('expanded')) return;
+    if(e.target.closest('.card-action-btn')) return;
+    if(currentIndex!==index){ currentIndex=index; initCarousel(); }
+  });
+  return card;
+}
 
-    function toggleFilterSwitch(el) {
-      el.classList.toggle('active');
-      applyFilters();
-    }
+function toggleSave(index,e){
+  e.stopPropagation();
+  if(savedMovies.has(index)) savedMovies.delete(index); else savedMovies.add(index);
+  persistSaved();
+  stage.querySelectorAll('.movie-card').forEach(c=>{
+    if(parseInt(c.dataset.index)===index){ const b=c.querySelector('.save-btn'); if(b) b.classList.toggle('saved',savedMovies.has(index)); }
+  });
+}
 
-    function toggleFilterSection(header) {
-      const section = header.parentElement;
-      section.classList.toggle('open');
-    }
+function initCarousel(){
+  stage.innerHTML='';
+  for(let i=-2;i<=2;i++){
+    const dataIndex=(currentIndex+i+movieData.length)%movieData.length;
+    stage.appendChild(createCard(movieData[dataIndex],currentIndex+i));
+  }
+  updateCarousel();
+}
+function updateCarousel(){
+  const cards=stage.querySelectorAll('.movie-card');
+  if(stage.querySelector('.expanded')) return;
+  cards.forEach(card=>{
+    const diff=parseInt(card.dataset.index)-currentIndex;
+    card.classList.remove('pos-0','pos--1','pos-1','pos--2','pos-2','pos--3','pos-3');
+    card.classList.add(diff===0?'pos-0':diff===-1?'pos--1':diff===1?'pos-1':diff===-2?'pos--2':diff===2?'pos-2':diff<-2?'pos--3':'pos-3');
+  });
+  const mi=(currentIndex+movieData.length)%movieData.length;
+  document.getElementById('mainTitle').textContent=movieData[mi].title;
+  document.getElementById('mainMood').textContent=movieData[mi].mood;
+}
+function expandCard(index,e){
+  e.stopPropagation();
+  const c=[...stage.querySelectorAll('.movie-card')].find(x=>parseInt(x.dataset.index)===index);
+  if(c){ c.classList.add('expanded'); carouselContainer.classList.add('has-expanded'); stage.classList.add('has-expanded'); }
+}
+function collapseCard(e){
+  e.stopPropagation();
+  const c=stage.querySelector('.expanded');
+  if(c){ c.classList.remove('expanded'); carouselContainer.classList.remove('has-expanded'); stage.classList.remove('has-expanded'); }
+}
+document.getElementById('prevBtn').addEventListener('click',()=>{currentIndex--;initCarousel();});
+document.getElementById('nextBtn').addEventListener('click',()=>{currentIndex++;initCarousel();});
 
-    // ЗАГРУЗКА ДАННЫХ ИЗ JSON
-    setTimeout(() => {
-      fetch('movies.json')
-        .then(response => response.json())
-        .then(data => {
-          movieData = data.movies.map(item => {
-            return {
-              id: item.identification.kinopoisk_id,
-              title: item.identification.title_ru,
-              year: item.identification.year,
-              rating: item.ratings.kinopoisk.value,
-              votes: item.ratings.kinopoisk.votes,
-              runtime: item.details.runtime_minutes,
-              age: item.details.age_ratings[0].rating,
-              country: item.details.countries[0],
-              countries: item.details.countries,
-              genres: item.details.genres,
-              format: item.identification.film_type.includes('документальный') ? 'Документальный' : (item.identification.film_type.includes('анимационный') ? 'Мультфильм' : 'Фильм'),
-              mood: item.content.mood,
-              whyWatch: item.content.synopsis, // Полный текст, обрезается в модалке
-              poster: item.poster.path,
-              trailer: item.poster.path,
-              kpUrl: item.identification.kinopoisk_url,
-              trailerUrl: item.links.official_trailer.url
-            };
-          });
-          
-          filteredMovies = [...movieData];
-          
-          currentIndex = Math.floor(movieData.length / 2);
-          initCarousel();
-          renderCatalog();
-          renderCountryFilters();
-          renderGenreFilters();
-        })
-        .catch(error => console.error('Ошибка загрузки данных:', error));
-    }, 300);
-  </script>
+/* ==== OVERLAYS ==== */
+const randomAiOverlay=document.getElementById('randomAiOverlay'),
+      chatAiOverlay=document.getElementById('chatAiOverlay'),
+      eyeOverlay=document.getElementById('eyeOverlay');
+document.getElementById('openRandomAiBtn').addEventListener('click',()=>randomAiOverlay.classList.add('active'));
+document.getElementById('closeRandomAi').addEventListener('click',()=>randomAiOverlay.classList.remove('active'));
+randomAiOverlay.addEventListener('click',e=>{if(e.target===randomAiOverlay)randomAiOverlay.classList.remove('active');});
+document.getElementById('openChatAiBtn').addEventListener('click',()=>{chatAiOverlay.classList.add('active');document.getElementById('chatInput').focus();});
+document.getElementById('closeChatAi').addEventListener('click',()=>chatAiOverlay.classList.remove('active'));
+chatAiOverlay.addEventListener('click',e=>{if(e.target===chatAiOverlay)chatAiOverlay.classList.remove('active');});
+/* глаз: закрытие только крестиком/фоном/Esc */
+document.getElementById('eyeClose').addEventListener('click',()=>eyeOverlay.classList.remove('active'));
+eyeOverlay.addEventListener('click',e=>{if(e.target===eyeOverlay)eyeOverlay.classList.remove('active');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){eyeOverlay.classList.remove('active');randomAiOverlay.classList.remove('active');chatAiOverlay.classList.remove('active');}});
+
+function showEyeModal(index){
+  const m=movieData[index], rc=getRatingClass(m.rating);
+  document.getElementById('eyePoster').style.backgroundImage=`url('${m.poster}')`;
+  document.getElementById('eyeTitle').textContent=m.title;
+  document.getElementById('eyeText').textContent=m.whyWatch;
+  document.getElementById('eyeWatchBtn').href='movie.html?id='+m.id;
+  document.getElementById('eyeBadges').innerHTML=`
+    <span class="eye-badge rating ${rc}">★ ${m.rating}</span>
+    <span class="eye-badge">${m.year}</span>
+    <span class="eye-badge">${m.runtime} мин</span>
+    <span class="eye-badge">${m.country}</span>
+    <span class="eye-badge">${m.age}</span>
+    <span class="eye-badge">${m.format}</span>`;
+  eyeOverlay.classList.add('active');
+}
+
+/* ==== ЧИПЫ / ТУМБЛЕРЫ ==== */
+function toggleChip(c){c.classList.toggle('active');}
+/* пункт 1: эксклюзивный выбор длительности */
+function selectDuration(c){
+  document.querySelectorAll('#durationRow .duration-chip').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active');
+}
+function resetRandomFilters(){
+  document.querySelectorAll('#randomAiOverlay .option-chip').forEach(c=>c.classList.remove('active'));
+  selectDuration(document.querySelector('#durationRow .duration-chip'));
+}
+function toggleFilterSwitch(el){el.classList.toggle('active');applyFilters();}
+function toggleFilterSection(h){h.parentElement.classList.toggle('open');}
+function switchFilterTab(t,b){
+  document.querySelectorAll('.filter-tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.filter-content').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); document.getElementById('filter-'+t).classList.add('active');
+}
+/* пункт 2: чекбокс кликабелен и синхронен */
+function toggleCheckbox(label){
+  const input=label.querySelector('input');
+  label.classList.toggle('active');
+  input.checked=label.classList.contains('active');
+  applyFilters();
+}
+
+/* ==== СЛУЧАЙНЫЙ ПОДБОР (учитывает длительность — пункт 1) ==== */
+document.getElementById('generateRandomBtn').addEventListener('click',()=>{
+  const active=document.querySelector('#durationRow .duration-chip.active');
+  let pool=[...movieData];
+  if(active){
+    const t=active.textContent.trim();
+    if(t==='< 90 мин') pool=pool.filter(m=>m.runtime<90);
+    else if(t==='90-120 мин') pool=pool.filter(m=>m.runtime>=90&&m.runtime<=120);
+    else if(t==='> 120 мин') pool=pool.filter(m=>m.runtime>120);
+  }
+  if(!pool.length){alert('По выбранным параметрам ничего не найдено.');return;}
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  randomAiOverlay.classList.remove('active');
+  currentIndex=movieData.findIndex(m=>m.id===pick.id);
+  initCarousel();
+  setTimeout(()=>{const c=stage.querySelectorAll('.movie-card')[2];if(c){c.classList.add('expanded');carouselContainer.classList.add('has-expanded');stage.classList.add('has-expanded');}},450);
+});
+
+/* ==== ЧАТ ==== */
+const chatInput=document.getElementById('chatInput'),chatMessages=document.getElementById('chatMessages');
+function addMessage(t,u){const d=document.createElement('div');d.className='message '+(u?'user':'ai');d.textContent=t;chatMessages.appendChild(d);chatMessages.scrollTop=chatMessages.scrollHeight;}
+document.getElementById('sendChatBtn').addEventListener('click',()=>{
+  const t=chatInput.value.trim(); if(!t)return; addMessage(t,true); chatInput.value='';
+  setTimeout(()=>addMessage('Отличный запрос! Советую «Седьмую печать» или «Пожары» — оба с сильной историей. Открыть страницу одного из них?',false),700);
+});
+chatInput.addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('sendChatBtn').click();});
+
+/* ==== КАТАЛОГ ==== */
+function getSorted(list){
+  const v=document.getElementById('sortSelect').value;
+  const a=[...list];
+  if(v==='rating')a.sort((x,y)=>y.rating-x.rating);
+  else if(v==='year')a.sort((x,y)=>y.year-x.year);
+  else if(v==='votes')a.sort((x,y)=>y.votes-x.votes);
+  return a;
+}
+function renderCatalog(movies=filteredMovies){
+  const grid=document.getElementById('catalogGrid'); grid.innerHTML='';
+  if(!movies.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">Фильмы не найдены. Измените фильтры.</div>';return;}
+  getSorted(movies).forEach(movie=>{
+    const oi=movieData.findIndex(m=>m.id===movie.id), rc=getRatingClass(movie.rating), isSaved=savedMovies.has(oi);
+    const item=document.createElement('div'); item.className='catalog-item';
+    item.innerHTML=`
+      <div class="catalog-poster-wrap" style="background-image:url('${movie.poster}')" data-idx="${oi}">
+        <div class="catalog-poster-rating ${rc}">${movie.rating}</div>
+        <button class="catalog-save-btn ${isSaved?'saved':''}" data-save-idx="${oi}" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+        <button class="catalog-eye-btn" data-eye-idx="${oi}" title="Почему стоит посмотреть"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+        <div class="catalog-poster-overlay"><div class="catalog-poster-title">${movie.title}</div></div>
+      </div>
+      <div class="catalog-meta"><div class="catalog-meta-title">${movie.title}</div>
+        <div class="catalog-meta-info"><span>${movie.year}</span><span class="dot"></span><span>${movie.runtime} мин</span><span class="dot"></span><span>${movie.country}</span></div></div>`;
+    grid.appendChild(item);
+  });
+  grid.querySelectorAll('.catalog-save-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const i=parseInt(b.dataset.saveIdx);if(savedMovies.has(i))savedMovies.delete(i);else savedMovies.add(i);persistSaved();b.classList.toggle('saved');}));
+  grid.querySelectorAll('.catalog-eye-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();showEyeModal(parseInt(b.dataset.eyeIdx));}));
+  grid.querySelectorAll('.catalog-poster-wrap').forEach(w=>w.addEventListener('click',e=>{if(e.target.closest('button'))return;window.location.href='movie.html?id='+movieData[parseInt(w.dataset.idx)].id;}));
+}
+document.getElementById('sortSelect').addEventListener('change',()=>renderCatalog());
+
+/* ==== ФИЛЬТРЫ ==== */
+function renderCountryFilters(){
+  const c=[...new Set(movieData.map(m=>m.country))].sort();
+  const box=document.getElementById('countryFilters'); box.innerHTML='';
+  c.forEach(country=>{
+    const l=document.createElement('label'); l.className='checkbox-item'; l.setAttribute('onclick','toggleCheckbox(this)');
+    l.innerHTML=`<input type="checkbox" value="${country}"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>${country}`;
+    box.appendChild(l);
+  });
+}
+function renderGenreFilters(){
+  const g=new Set(); movieData.forEach(m=>m.genres.forEach(x=>g.add(x)));
+  const box=document.getElementById('genreFilters'); box.innerHTML='';
+  [...g].sort().forEach(genre=>{
+    const l=document.createElement('label'); l.className='checkbox-item'; l.setAttribute('onclick','toggleCheckbox(this)');
+    l.innerHTML=`<input type="checkbox" value="${genre}"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>${genre}`;
+    box.appendChild(l);
+  });
+}
+function applyFilters(){
+  let f=[...movieData];
+  const sel=(id)=>[...document.querySelectorAll('#'+id+' .checkbox-item.active input')].map(i=>i.value);
+  const countries=sel('countryFilters'); if(countries.length) f=f.filter(m=>countries.includes(m.country));
+  const years=sel('yearFilters'); if(years.length) f=f.filter(m=>(years.includes('before2000')&&m.year<2000)||(years.includes('2000to2010')&&m.year>=2000&&m.year<=2010)||(years.includes('2010to2020')&&m.year>2010&&m.year<=2020)||(years.includes('after2020')&&m.year>2020));
+  const runs=sel('runtimeFilters'); if(runs.length) f=f.filter(m=>(runs.includes('short')&&m.runtime<90)||(runs.includes('medium')&&m.runtime>=90&&m.runtime<=120)||(runs.includes('long')&&m.runtime>120));
+  const rats=sel('ratingFilters'); if(rats.length) f=f.filter(m=>{const r=parseFloat(m.rating);return (rats.includes('high')&&r>=8)||(rats.includes('medium')&&r>=7&&r<8)||(rats.includes('low')&&r<7);});
+  const ages=sel('ageFilters'); if(ages.length) f=f.filter(m=>ages.includes(m.age));
+  const gens=sel('genreFilters'); if(gens.length) f=f.filter(m=>m.genres.some(g=>gens.includes(g)));
+  if(document.getElementById('hideWatchedToggle').classList.contains('active')) f=f.filter(m=>!watchedMovies.has(m.id)); /* пункт 3 */
+  filteredMovies=f; renderCatalog(f);
+}
+function resetAllFilters(){
+  document.querySelectorAll('.checkbox-item').forEach(i=>{i.classList.remove('active');const inp=i.querySelector('input');if(inp)inp.checked=false;});
+  document.querySelectorAll('.filter-toggle').forEach(t=>t.classList.remove('active'));
+  filteredMovies=[...movieData]; renderCatalog();
+}
+
+/* ==== ЗАГРУЗКА ==== */
+fetch('movies.json').then(r=>r.json()).then(data=>{
+  movieData=data.movies.map(item=>{
+    const id=item.identification.kinopoisk_id;
+    return {
+      id, title:item.identification.title_ru, year:item.identification.year,
+      rating:item.ratings.kinopoisk.value, votes:item.ratings.kinopoisk.votes,
+      runtime:item.details.runtime_minutes, age:item.details.age_ratings[0].rating,
+      country:item.details.countries[0], countries:item.details.countries, genres:item.details.genres,
+      format:item.identification.film_type.includes('документальный')?'Документальный':item.identification.film_type.includes('анимационный')?'Мультфильм':'Фильм',
+      mood:item.content.mood, whyWatch:item.content.synopsis,
+      poster:POSTER_MAP[id]||item.poster.path, trailer:POSTER_MAP[id]||item.poster.path,
+      kpUrl:item.identification.kinopoisk_url, trailerUrl:item.links.official_trailer.url
+    };
+  });
+  filteredMovies=[...movieData];
+  currentIndex=Math.floor(movieData.length/2);
+  initCarousel(); renderCatalog(); renderCountryFilters(); renderGenreFilters();
+}).catch(e=>console.error('Ошибка загрузки данных:',e));
+</script>
 </body>
 </html>
