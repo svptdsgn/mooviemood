@@ -139,7 +139,7 @@
         font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
     }
     .ai-rec-header svg { width: 16px; height: 16px; }
-    .ai-rec-text { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9); }
+    .ai-rec-text { font-size: 15px; line-height: 1.6; color: rgba(255,255,255,0.9); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
     .actions-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 32px; }
     .btn-watch {
@@ -249,6 +249,7 @@
     .reviews-all-btn:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
     .reviews-all-btn svg { width: 14px; height: 14px; }
 
+    /* РАЗДЕЛ С РИЛСАМИ (ЯРКИЕ МОМЕНТЫ) */
     .clips-section { margin-bottom: 56px; }
     .clips-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
     .clips-title { font-size: 24px; font-weight: 700; color: var(--text-main); }
@@ -450,40 +451,33 @@
         return m + ' мин';
     }
 
-    // Генератор умного описания "Почему стоит посмотреть"
+    // Генератор умного описания "Почему стоит посмотреть" (сокращенный)
     function generateAiRecommendation(movie) {
         var parts = [];
         
-        // 1. Берем первые 2 предложения из синопсиса
+        // 1. Берем только первое предложение из синопсиса
         if (movie.synopsis) {
             var sentences = movie.synopsis.split('. ');
-            var shortSynopsis = sentences.slice(0, 2).join('. ');
-            if (shortSynopsis.length > 10) parts.push(shortSynopsis + (shortSynopsis.endsWith('.') ? '' : '.'));
+            var shortSynopsis = sentences[0];
+            if (shortSynopsis.length > 10) parts.push(shortSynopsis + '.');
         }
 
-        // 2. Добавляем упоминание жанров и настроения
-        var genreText = movie.genres && movie.genres.length ? movie.genres.join(' и ') : '';
+        // 2. Добавляем упоминание жанров и настроения (кратко)
+        var genreText = movie.genres && movie.genres.length ? movie.genres[0] : ''; // Берем только первый жанр
         var moodText = movie.mood ? movie.mood.toLowerCase() : '';
         
         if (genreText && moodText) {
-            parts.push('Это ' + genreText + ' кино с ' + moodText + ' атмосферой.');
+            parts.push('Это ' + genreText + ' с ' + moodText + ' атмосферой.');
         } else if (genreText) {
-            parts.push('Это ' + genreText + ' кино.');
+            parts.push('Это ' + genreText + '.');
         } else if (moodText) {
             parts.push('Кино с ' + moodText + ' атмосферой.');
         }
 
-        // 3. Добавляем упоминание рейтинга или режиссера
-        if (movie.rating >= 8.0) {
-            parts.push('Высокий рейтинг (' + movie.rating + ') подтверждает его качество.');
-        } else if (movie.directors && movie.directors.length) {
-            parts.push('Режиссерская работа ' + movie.directors[0] + ' заслуживает внимания.');
-        }
+        // 3. Не добавляем рейтинг, чтобы не перегружать
 
         var result = parts.join(' ');
-        if (result.length < 20) {
-            return 'Этот фильм — отличный выбор для вечера, если вы цените ' + (genreText || 'хорошее кино') + '.';
-        }
+        // Обрезаем до 3-4 строк визуально (через CSS line-clamp)
         return result;
     }
 
@@ -715,7 +709,7 @@
 
         var votesText = movie.votes ? movie.votes.toLocaleString('ru-RU') + ' оценок' : 'Оценок пока нет';
         
-        // Вызываем генератор
+        // Вызываем генератор (теперь он короткий)
         var aiRecText = generateAiRecommendation(movie);
 
         container.innerHTML =
@@ -725,18 +719,22 @@
                 '<div class="movie-info">' +
                     '<h1>' + movie.title + ' <span style="color:var(--text-muted);font-weight:400;">(' + movie.year + ')</span></h1>' +
                     '<div class="movie-teaser">' + teaserHTML + '</div>' +
-                    '<div class="movie-logline">' + movie.logline + '</div>' +
+                    // Убрали logline, оставили только ИИ-описание
                     
-                    // ВСТАВЛЕННЫЙ БЛОК ИИ
                     '<div class="ai-recommendation-block">' +
                         '<div class="ai-rec-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg><span>Почему стоит посмотреть</span></div>' +
                         '<p class="ai-rec-text">' + aiRecText + '</p>' +
                     '</div>' +
-                    // КОНЕЦ БЛОКА ИИ
 
                     buildActionsRow(movie) +
                     '<div class="specs">' + specsHTML + '</div>' +
                 '</div>' +
+            '</section>' +
+
+            // Добавляем раздел с рилсами (если есть)
+            '<section class="clips-section" id="clips-section">' +
+                '<div class="clips-header"><div><h2 class="clips-title">🎬 Яркие моменты</h2><div class="clips-subtitle">Короткие нарезки из фильма</div></div></div>' +
+                '<div class="clips-container"></div>' +
             '</section>' +
 
             '<h2 class="section-heading">О фильме</h2>' +
@@ -754,11 +752,6 @@
                     '<div class="rate-buttons"><button class="rate-btn" data-rate="up">👍 Нравится</button><button class="rate-btn" data-rate="down">Не нравится</button></div>' +
                     '<div id="reviews-wrap"></div>' +
                 '</div>' +
-            '</section>' +
-
-            '<section class="clips-section" id="clips-section">' +
-                '<div class="clips-header"><div><h2 class="clips-title">🎬 Яркие моменты</h2><div class="clips-subtitle">Короткие нарезки из фильма</div></div></div>' +
-                '<div class="clips-container"></div>' +
             '</section>' +
 
             '<section class="team-block">' +
