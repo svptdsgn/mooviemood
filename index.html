@@ -80,7 +80,7 @@
   .chat-input-row button { background: var(--surface); color: var(--text-dark); border: none; padding: 0 20px; border-radius: 100px; font-size: 18px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
   .chat-input-row button:hover { opacity: 0.9; }
 
-  /* --- ИСПРАВЛЕННАЯ МОДАЛКА ГЛАЗА (как на скрине 1) --- */
+  /* --- МОДАЛКА ГЛАЗА (как на скрине 1) --- */
   .eye-modal { max-width: 900px; width: 90%; padding: 0; overflow: hidden; display: flex; flex-direction: row; min-height: 500px; background: #0F0F0F; border-radius: var(--radius-md); }
   .eye-modal-poster { width: 45%; background-size: cover; background-position: center; position: relative; }
   .eye-modal-content { width: 55%; padding: 40px; display: flex; flex-direction: column; position: relative; background: #0F0F0F; }
@@ -102,7 +102,7 @@
   .eye-watch-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(168,85,247,0.5); }
   .eye-watch-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-  /* --- ФИЛЬТРЫ (возвращены как на скринах 3 и 4) --- */
+  /* --- ФИЛЬТРЫ --- */
   .filters-panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; position: sticky; top: 90px; height: fit-content; max-height: calc(100vh - 110px); overflow-y: auto; }
   .filters-panel::-webkit-scrollbar { width: 4px; }
   .filters-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
@@ -139,7 +139,7 @@
   .reset-filters-btn { width: 100%; background: transparent; color: var(--text-muted); border: none; padding: 10px 24px; font-size: 13px; font-weight: 400; font-family: var(--font); cursor: pointer; margin-top: 8px; transition: all 0.2s; }
   .reset-filters-btn:hover { color: var(--text-main); }
 
-  /* Каталог (остался без изменений) */
+  /* Каталог */
   .catalog-section { padding: 60px 40px; border-top: 1px solid var(--border-color); max-width: 1400px; margin: 0 auto; width: 100%; }
   .catalog-header { margin-bottom: 32px; }
   .catalog-title { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
@@ -215,7 +215,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА СЛУЧАЙНОГО ПОДБОРА (не менял) -->
+  <!-- МОДАЛКА СЛУЧАЙНОГО ПОДБОРА -->
   <div class="overlay" id="randomAiOverlay">
     <div class="modal-window">
       <button class="modal-close" id="closeRandomAi">×</button>
@@ -271,7 +271,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ЧАТА (не менял) -->
+  <!-- МОДАЛКА ЧАТА -->
   <div class="overlay" id="chatAiOverlay">
     <div class="modal-window chat-container">
       <button class="modal-close" id="closeChatAi">×</button>
@@ -286,7 +286,7 @@
     </div>
   </div>
 
-  <!-- --- ИСПРАВЛЕННАЯ МОДАЛКА ГЛАЗА (структура как на скрине 1) --- -->
+  <!-- МОДАЛКА ГЛАЗА -->
   <div class="overlay" id="eyeOverlay">
     <div class="modal-window eye-modal">
       <button class="modal-close" id="eyeClose">×</button>
@@ -330,7 +330,8 @@
           <button class="filter-tab active" onclick="switchFilterTab('main', this)">Основные</button>
           <button class="filter-tab" onclick="switchFilterTab('extra', this)">Дополнительные</button>
         </div>
-        <!-- ВКЛАДКА ОСНОВНЫЕ (возвращена к скрину 3 и 4) -->
+        
+        <!-- ВКЛАДКА ОСНОВНЫЕ -->
         <div id="filter-main" class="filter-content active">
           <div class="filter-section open">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
@@ -398,7 +399,6 @@
             </div>
           </div>
           <div class="filter-divider"></div>
-          <!-- Блок дополнительно с переключателями (как на скрине 3) -->
           <div class="filter-section open">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Дополнительно</span>
@@ -416,57 +416,110 @@
           <button class="filters-apply-btn" onclick="applyFilters()">Применить фильтры</button>
           <button class="reset-filters-btn" onclick="resetAllFilters()">Сбросить все фильтры</button>
         </div>
-        <!-- ВКЛАДКА ДОПОЛНИТЕЛЬНЫЕ (структура со скрина 3) -->
+
+        <!-- ВКЛАДКА ДОПОЛНИТЕЛЬНЫЕ (обновлена по скриншотам) -->
         <div id="filter-extra" class="filter-content">
+          <!-- Жанры -->
           <div class="filter-section open">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Жанры</span>
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <div class="filter-section-content"><div class="checkbox-group" id="genreFilters"></div></div>
+            <div class="filter-section-content">
+              <div class="checkbox-group" id="genreFilters"></div>
+            </div>
           </div>
           <div class="filter-divider"></div>
-          <!-- Добавлены секции со скрина 3 -->
+
+          <!-- Случай -->
           <div class="filter-section">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Случай</span>
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+            <div class="filter-section-content">
+              <div class="checkbox-group" id="occasionFilters">
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="family"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>👨‍👩‍👧‍👦 Семейный вечер</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="bachelorette"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>💃 Девичник</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="friends"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🧑‍🤝‍🧑 С друзьями</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="sport"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🏋️ Про спорт</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="inspire"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>✨ Вдохновляющее</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="date"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>💘 Для свидания</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="alone"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>☁️ На одинокий вечер</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="holiday"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🎄 Праздничное</label>
+              </div>
+            </div>
           </div>
           <div class="filter-divider"></div>
+
+          <!-- Сюжет и сеттинг -->
           <div class="filter-section">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Сюжет и сеттинг</span>
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+            <div class="filter-section-content">
+              <div class="checkbox-group" id="plotFilters">
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="maniacs"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🔪 Маньяки и убийцы</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="racing"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🏎️ Гонки и скорость</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="haunted"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🏚️ Неладное в доме</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="chase"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🏃 Погоня и преследование</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="heist"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🎃 Ограбления и аферы</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="survival"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🏕️ Выживание</label>
+              </div>
+            </div>
           </div>
           <div class="filter-divider"></div>
+
+          <!-- Сюжетный поворот -->
           <div class="filter-section">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Сюжетный поворот</span>
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+            <div class="filter-section-content">
+              <div class="checkbox-group" id="twistFilters">
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="unexpected"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🤯 Неожиданная развязка</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="nonlinear"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🌀 Нелинейное повествование</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="open"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🤔 Открытый финал</label>
+              </div>
+            </div>
           </div>
           <div class="filter-divider"></div>
+
+          <!-- Тон и атмосфера -->
           <div class="filter-section">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Тон и атмосфера</span>
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+            <div class="filter-section-content">
+              <div class="checkbox-group" id="toneFilters">
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="dark"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🟣 Мрачное и напряжённое</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="light"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🌞 Солнечное и лёгкое</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="inspiring"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>✨ Вдохновляющее</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="surreal"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🌀 Странное и сюрреалистичное</label>
+              </div>
+            </div>
           </div>
           <div class="filter-divider"></div>
+
+          <!-- Темп -->
           <div class="filter-section">
             <div class="filter-section-header" onclick="toggleFilterSection(this)">
               <span class="filter-section-title">Темп</span>
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <div class="filter-section-content"><div class="checkbox-group"></div></div>
+            <div class="filter-section-content">
+              <div class="checkbox-group" id="paceFilters">
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="dynamic"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>💥 Динамичный экшн</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="slow"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🦥 Медленное кино</label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this, event)"><input type="checkbox" value="talky"><span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>🗣️ Разговорный</label>
+              </div>
+            </div>
           </div>
           <div class="filter-divider"></div>
+
           <button class="filters-apply-btn" onclick="applyFilters()">Применить фильтры</button>
           <button class="reset-filters-btn" onclick="resetAllFilters()">Сбросить все фильтры</button>
         </div>
@@ -712,14 +765,29 @@
     function applyFilters() {
       let f = [...movieData];
       const sel = (id) => [...document.querySelectorAll('#' + id + ' .checkbox-item.active input')].map(i => i.value);
+      
+      // Основные фильтры
       const countries = sel('countryFilters'); if (countries.length) f = f.filter(m => countries.includes(m.country));
       const years = sel('yearFilters'); if (years.length) f = f.filter(m => (years.includes('before2000') && m.year < 2000) || (years.includes('2000to2010') && m.year >= 2000 && m.year <= 2010) || (years.includes('2010to2020') && m.year > 2010 && m.year <= 2020) || (years.includes('after2020') && m.year > 2020));
       const runs = sel('runtimeFilters'); if (runs.length) f = f.filter(m => (runs.includes('short') && m.runtime < 90) || (runs.includes('medium') && m.runtime >= 90 && m.runtime <= 120) || (runs.includes('long') && m.runtime > 120));
       const rats = sel('ratingFilters'); if (rats.length) f = f.filter(m => { const r = parseFloat(m.rating); return (rats.includes('high') && r >= 8) || (rats.includes('medium') && r >= 7 && r < 8) || (rats.includes('low') && r < 7); });
       const ages = sel('ageFilters'); if (ages.length) f = f.filter(m => ages.includes(m.age));
+      
+      // Дополнительные фильтры
       const gens = sel('genreFilters'); if (gens.length) f = f.filter(m => m.genres && m.genres.some(g => gens.includes(g)));
+      
+      // Новые фильтры (пока просто заглушки, так как данных в movies.json для них нет, 
+      // но код готов их принять, если ты добавишь поля в JSON)
+      // Например: m.occasion, m.plot, m.twist, m.tone, m.pace
+      const occasions = sel('occasionFilters'); if (occasions.length) f = f.filter(m => m.occasion && occasions.includes(m.occasion));
+      const plots = sel('plotFilters'); if (plots.length) f = f.filter(m => m.plot && plots.includes(m.plot));
+      const twists = sel('twistFilters'); if (twists.length) f = f.filter(m => m.twist && twists.includes(m.twist));
+      const tones = sel('toneFilters'); if (tones.length) f = f.filter(m => m.tone && tones.includes(m.tone));
+      const paces = sel('paceFilters'); if (paces.length) f = f.filter(m => m.pace && paces.includes(m.pace));
+
       const hideWatched = document.querySelector('#filter-main .filter-toggle-item:last-child .filter-toggle').classList.contains('active');
       if (hideWatched) f = f.filter(m => !watchedMovies.has(m.id));
+      
       filteredMovies = f; renderCatalog(f);
     }
 
