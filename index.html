@@ -446,6 +446,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow-y: auto;
   }
   
   .eye-modal-content .modal-close {
@@ -527,6 +528,8 @@
     line-height: 1.6;
     color: rgba(255,255,255,0.85);
     font-weight: 400;
+    max-height: 150px;
+    overflow-y: auto;
   }
   
   .eye-watch-btn {
@@ -1310,6 +1313,10 @@
                   <span class="filter-toggle-label">Можно с детьми</span>
                   <div class="filter-toggle" onclick="toggleFilterSwitch(this)"></div>
                 </div>
+                <div class="filter-toggle-item">
+                  <span class="filter-toggle-label">Убрать просмотренные</span>
+                  <div class="filter-toggle" onclick="toggleFilterSwitch(this)"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -1885,12 +1892,10 @@
 
     function setupCheckboxHandlers() {
       document.querySelectorAll('.checkbox-item').forEach(item => {
-        // Убираем старые обработчики, чтобы не дублировались
         const clone = item.cloneNode(true);
         item.parentNode.replaceChild(clone, item);
       });
       
-      // Заново вешаем обработчики на все чекбоксы (кроме тех, что уже в renderCountryFilters/GenreFilters)
       document.querySelectorAll('.checkbox-item:not(#countryFilters .checkbox-item):not(#genreFilters .checkbox-item)').forEach(item => {
         item.addEventListener('click', function(e) {
           e.preventDefault();
@@ -1958,6 +1963,12 @@
         );
       }
       
+      // Убрать просмотренные
+      const hideWatched = document.querySelector('.filter-toggle-item:last-child .filter-toggle').classList.contains('active');
+      if (hideWatched) {
+        // Тут нужна логика для просмотренных (пока просто заглушка, т.к. мы не храним историю)
+      }
+
       filteredMovies = filtered;
       renderCatalog(filtered);
     }
@@ -2008,7 +2019,7 @@
               genres: item.details.genres,
               format: item.identification.film_type.includes('документальный') ? 'Документальный' : (item.identification.film_type.includes('анимационный') ? 'Мультфильм' : 'Фильм'),
               mood: item.content.mood,
-              whyWatch: item.content.synopsis,
+              whyWatch: item.content.synopsis.substring(0, 800) + '...', // Ограничиваем текст для глазика
               poster: item.poster.path,
               trailer: item.poster.path,
               kpUrl: item.identification.kinopoisk_url,
@@ -2018,7 +2029,6 @@
           
           filteredMovies = [...movieData];
           
-          // Инициализация после загрузки данных
           currentIndex = Math.floor(movieData.length / 2);
           initCarousel();
           renderCatalog();
