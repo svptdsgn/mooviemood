@@ -240,14 +240,8 @@
   }
   .expanded-close:hover { background: rgba(255,255,255,0.15); }
   
-  .expanded-title { 
-    font-size: 32px; font-weight: 600; margin-bottom: 10px; 
-    color: var(--text-main); letter-spacing: -0.02em; line-height: 1.1;
-  }
-  .expanded-mood { 
-    font-size: 13px; color: var(--text-muted); margin-bottom: 28px; 
-    text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500;
-  }
+  .expanded-title { font-size: 32px; font-weight: 600; margin-bottom: 10px; color: var(--text-main); letter-spacing: -0.02em; line-height: 1.1; }
+  .expanded-mood { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; }
   
   .ai-recommendation {
     background: linear-gradient(135deg, rgba(250, 204, 21, 0.08) 0%, rgba(250, 204, 21, 0.03) 100%);
@@ -263,10 +257,7 @@
     margin-bottom: 14px; letter-spacing: 0.12em;
   }
   .ai-label svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; }
-  .expanded-desc { 
-    font-size: 15px; line-height: 1.65; 
-    color: rgba(255,255,255,0.85); font-weight: 400; letter-spacing: -0.01em;
-  }
+  .expanded-desc { font-size: 15px; line-height: 1.65; color: rgba(255,255,255,0.85); font-weight: 400; letter-spacing: -0.01em; }
 
   .movie-info { text-align: center; margin-top: 40px; transition: opacity 0.3s; }
   .carousel-container.has-expanded .movie-info, .carousel-container.has-expanded .bottom-controls { opacity: 0; pointer-events: none; }
@@ -1098,46 +1089,7 @@
 
       <div id="aiResults" style="display: none;">
         <h2>Вам может понравиться</h2>
-        <div class="results-list">
-            <div class="result-item">
-                <div class="result-header" onclick="toggleAiDesc(this)">
-                    <div class="result-title">Седьмая печать</div>
-                    <div class="result-ai-btn" onclick="event.stopPropagation(); toggleAiDesc(this.parentElement)">
-                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </div>
-                </div>
-                <div class="result-ai-desc">
-                    <div class="ai-tag">✦ ИИ рекомендует</div>
-                    <p>Идеально подходит под ваше мистическое настроение. Фильм задаёт глубокие вопросы о жизни и смерти, а строгая чёрно-белая картинка создаёт нужную созерцательную атмосферу.</p>
-                </div>
-            </div>
-            
-            <div class="result-item">
-                <div class="result-header" onclick="toggleAiDesc(this)">
-                    <div class="result-title">Пожары</div>
-                    <div class="result-ai-btn" onclick="event.stopPropagation(); toggleAiDesc(this.parentElement)">
-                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </div>
-                </div>
-                <div class="result-ai-desc">
-                    <div class="ai-tag">✦ ИИ рекомендует</div>
-                    <p>Сильная драма, которая резонирует с грустным настроением. Захватывающий нелинейный сюжет и невероятная игра актёров заставят вас сопереживать главным героям.</p>
-                </div>
-            </div>
-
-            <div class="result-item">
-                <div class="result-header" onclick="toggleAiDesc(this)">
-                    <div class="result-title">Новая волна</div>
-                    <div class="result-ai-btn" onclick="event.stopPropagation(); toggleAiDesc(this.parentElement)">
-                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </div>
-                </div>
-                <div class="result-ai-desc">
-                    <div class="ai-tag">✦ ИИ рекомендует</div>
-                    <p>Яркая и динамичная картина, которая отлично сбалансирует мрачный настрой. Отличный выбор, если вы хотите отвлечься и насладиться красивой картинкой.</p>
-                </div>
-            </div>
-        </div>
+        <div class="results-list" id="randomResultsList"></div>
         <button class="submit-btn" style="margin-top: 24px; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="resetAiSearch()">Изменить параметры</button>
       </div>
     </div>
@@ -1373,53 +1325,7 @@
               <svg class="filter-section-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="filter-section-content">
-              <div class="checkbox-group">
-                <label class="checkbox-item">
-                  <input type="checkbox" value="drama">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  🎬 Драмы
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="comedy">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  😂 Комедии
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="detective">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  🕵️ Детективы
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="war">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  ⚔️ Военные
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="fantasy">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  🧙 Фэнтези
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="animation">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  🎨 Анимация
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="documentary">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  📄 Документальные
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="historical">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  📜 Исторические
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" value="biography">
-                  <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                  👤 Биография
-                </label>
-              </div>
+              <div class="checkbox-group" id="genreFilters"></div>
             </div>
           </div>
 
@@ -1616,22 +1522,9 @@
   </section>
 
   <script>
-    const movieData = [
-      { id: 1259195, title: 'Война искусств', titleOriginal: 'War of Art', mood: 'Любопытное и напряжённое', rating: '7.4', poster: 'posters/iskustv.jpg', year: 2019, country: 'Норвегия', runtime: 102, age: '18+', format: 'Документальный', genres: ['documentary'], whyWatch: 'Группа западных художников едет в Северную Корею ради культурного обмена. Вы увидите, как сталкиваются разные представления об искусстве и свободе.', cast: ['Мортен Тровик', 'Хенрик Плахт', 'Ник Новак'], director: 'Томми Гулликсен', trailer: 'https://www.kinopoisk.ru/film/1259195/' },
-      { id: 5237750, title: 'Не хороните меня без Ивана', titleOriginal: 'Кэрэни көрбүт', mood: 'Тёплое и созерцательное', rating: '8.0', poster: 'posters/ivan.jpg', year: 2022, country: 'Россия', runtime: 124, age: '12+', format: 'Фильм', genres: ['drama', 'comedy', 'historical'], whyWatch: 'Якутский крестьянин боится быть похороненным заживо из-за приступов летаргического сна. Он отправляется в экспедицию вслед за художником-этнографом.', cast: ['Дариус Гумаускас', 'Александр Чичахов', 'Михаил Сажин'], director: 'Любовь Борисова', trailer: 'https://www.kinopoisk.ru/film/5237750/' },
-      { id: 225011, title: 'Изгнание', titleOriginal: 'The Banishment', mood: 'Созерцательное и тревожное', rating: '7.3', poster: 'posters/izgnanie.jpg', year: 2007, country: 'Россия', runtime: 150, age: '18+', format: 'Фильм', genres: ['drama'], whyWatch: 'Вторая работа Андрея Звягинцева. Семья уезжает в загородный дом, но напряжение между супругами следует за ними.', cast: ['Константин Лавроненко', 'Мария Бонневи', 'Александр Балуев'], director: 'Андрей Звягинцев', trailer: 'https://www.kinopoisk.ru/film/225011/' },
-      { id: 1347315, title: 'Книготорговцы', titleOriginal: 'The Booksellers', mood: 'Тёплое и разговорное', rating: '7.6', poster: 'posters/knogo.jpg', year: 2019, country: 'США', runtime: 99, age: '18+', format: 'Документальный', genres: ['documentary'], whyWatch: 'Документальный фильм о нью-йоркских букинистах, коллекционерах и писателях. Вы увидите мир редких книг.', cast: ['Паркер Поузи', 'Фрэн Лебовиц', 'Гей Тализ'], director: 'Д. У. Янг', trailer: 'https://www.kinopoisk.ru/film/1347315/' },
-      { id: 425, title: 'Седьмая печать', titleOriginal: 'Det sjunde inseglet', mood: 'Мрачное и философское', rating: '8.1', poster: 'posters/pechat.jpg', year: 1957, country: 'Швеция', runtime: 96, age: '18+', format: 'Фильм', genres: ['drama', 'fantasy'], whyWatch: 'Классика Ингмара Бергмана. Рыцарь возвращается из крестового похода и предлагает Смерти сыграть в шахматы.', cast: ['Макс фон Сюдов', 'Гуннар Бьёрнстранд', 'Бенгт Экерот'], director: 'Ингмар Бергман', trailer: 'https://www.kinopoisk.ru/film/425/' },
-      { id: 714248, title: 'Песнь моря', titleOriginal: 'Song of the Sea', mood: 'Нежное и волшебное', rating: '8.2', poster: 'posters/pesn.jpg', year: 2014, country: 'Ирландия', runtime: 93, age: '6+', format: 'Мультфильм', genres: ['animation', 'fantasy'], whyWatch: 'Ирландская анимация от Томма Мура о брате и сестре, которые отправляются через мир преданий.', cast: ['Дэвид Роул', 'Люси О\'Коннелл', 'Брендан Глисон'], director: 'Томм Мур', trailer: 'https://www.kinopoisk.ru/film/714248/' },
-      { id: 425400, title: 'Пожары', titleOriginal: 'Incendies', mood: 'Напряжённое и скорбное', rating: '8.1', poster: 'posters/pozhari.jpg', year: 2010, country: 'Канада', runtime: 131, age: '18+', format: 'Фильм', genres: ['drama', 'detective', 'war'], whyWatch: 'Дени Вильнёв экранизировал пьесу Важди Муавада о канадских близнецах, которые после смерти матери отправляются на Ближний Восток.', cast: ['Лубна Азабаль', 'Мелисса Дезормо-Пулен', 'Максим Годетт'], director: 'Дени Вильнёв', trailer: 'https://www.kinopoisk.ru/film/425400/' },
-      { id: 1040690, title: 'Середина 90-х', titleOriginal: 'Mid90s', mood: 'Тёплое и ностальгическое', rating: '7.4', poster: 'posters/seredina.jpg', year: 2018, country: 'США', runtime: 85, age: '18+', format: 'Фильм', genres: ['drama', 'comedy'], whyWatch: 'Режиссёрский дебют Джоны Хилла о тринадцатилетнем подростке из Лос-Анджелеса.', cast: ['Санни Сулджик', 'Кэтрин Уотерстон', 'Лукас Хеджес'], director: 'Джона Хилл', trailer: 'https://www.kinopoisk.ru/film/1040690/' },
-      { id: 677566, title: 'Великая красота', titleOriginal: 'La grande bellezza', mood: 'Меланхоличное и чувственное', rating: '7.8', poster: 'posters/velikaya.jpg', year: 2013, country: 'Италия', runtime: 141, age: '18+', format: 'Фильм', genres: ['drama', 'comedy'], whyWatch: 'Паоло Соррентино снял современный ответ "Сладкой жизни" Феллини.', cast: ['Тони Сервилло', 'Карло Вердоне', 'Сабрина Ферилли'], director: 'Паоло Соррентино', trailer: 'https://www.kinopoisk.ru/film/677566/' },
-      { id: 6553389, title: 'Новая волна', titleOriginal: 'Nouvelle Vague', mood: 'Лёгкое и увлечённое', rating: '7.6', poster: 'posters/volna.jpg', year: 2025, country: 'Франция', runtime: 105, age: '18+', format: 'Фильм', genres: ['drama', 'comedy', 'biography'], whyWatch: 'Ричард Линклейтер снял фильм о создании "На последнем дыхании" — дебюта Жан-Люка Годара.', cast: ['Гийом Марбек', 'Зои Дойч', 'Обри Дюллен'], director: 'Ричард Линклейтер', trailer: 'https://www.kinopoisk.ru/film/6553389/' }
-    ];
-
-    const stage = document.getElementById('stage');
-    const carouselContainer = document.getElementById('carouselContainer');
-    let currentIndex = 4;
+    let movieData = [];
+    let filteredMovies = [];
+    let currentIndex = 0;
     const savedMovies = new Set();
 
     function getRatingClass(rating) {
@@ -1670,7 +1563,7 @@
                     <svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg>
                     ПОЧЕМУ ВАМ СТОИТ ПОСМОТРЕТЬ
                 </div>
-                <p class="expanded-desc">${data.whyWatch}</p>
+                <p class="expanded-desc">${data.whyWatch || 'Этот фильм обладает уникальной атмосферой и сильным сюжетом.'}</p>
             </div>
         </div>
       `;
@@ -1791,7 +1684,7 @@
       
       document.getElementById('eyePoster').style.backgroundImage = `url('${movie.poster}')`;
       document.getElementById('eyeTitle').textContent = movie.title;
-      document.getElementById('eyeText').textContent = movie.whyWatch;
+      document.getElementById('eyeText').textContent = movie.whyWatch || 'Этот фильм обладает уникальной атмосферой и сильным сюжетом.';
       document.getElementById('eyeWatchBtn').dataset.movieId = movie.id;
       
       const badgesHtml = `
@@ -1823,7 +1716,7 @@
     document.getElementById('generateRandomBtn').addEventListener('click', () => {
       randomAiOverlay.classList.remove('active');
       resetToFilters();
-      currentIndex = 4;
+      currentIndex = Math.floor(Math.random() * movieData.length);
       initCarousel();
       setTimeout(() => {
         const cards = stage.querySelectorAll('.movie-card');
@@ -1874,8 +1767,6 @@
     });
 
     // КАТАЛОГ И ФИЛЬТРАЦИЯ
-    let filteredMovies = [...movieData];
-
     function renderCatalog(movies = movieData) {
       const grid = document.getElementById('catalogGrid');
       grid.innerHTML = '';
@@ -1970,9 +1861,37 @@
       });
     }
 
-    // Обработчики для всех чекбоксов
+    function renderGenreFilters() {
+      const allGenres = new Set();
+      movieData.forEach(m => m.genres.forEach(g => allGenres.add(g)));
+      const container = document.getElementById('genreFilters');
+      container.innerHTML = '';
+      Array.from(allGenres).sort().forEach(genre => {
+        const label = document.createElement('label');
+        label.className = 'checkbox-item';
+        label.innerHTML = `
+          <input type="checkbox" value="${genre}">
+          <span class="checkbox-mark"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+          ${genre}
+        `;
+        label.addEventListener('click', function(e) {
+          e.preventDefault();
+          this.classList.toggle('active');
+          applyFilters();
+        });
+        container.appendChild(label);
+      });
+    }
+
     function setupCheckboxHandlers() {
       document.querySelectorAll('.checkbox-item').forEach(item => {
+        // Убираем старые обработчики, чтобы не дублировались
+        const clone = item.cloneNode(true);
+        item.parentNode.replaceChild(clone, item);
+      });
+      
+      // Заново вешаем обработчики на все чекбоксы (кроме тех, что уже в renderCountryFilters/GenreFilters)
+      document.querySelectorAll('.checkbox-item:not(#countryFilters .checkbox-item):not(#genreFilters .checkbox-item)').forEach(item => {
         item.addEventListener('click', function(e) {
           e.preventDefault();
           this.classList.toggle('active');
@@ -2032,7 +1951,7 @@
       }
       
       // Жанры
-      const selectedGenres = [...document.querySelectorAll('#filter-extra .checkbox-item.active input')].map(cb => cb.value);
+      const selectedGenres = [...document.querySelectorAll('#genreFilters .checkbox-item.active input')].map(cb => cb.value);
       if (selectedGenres.length > 0) {
         filtered = filtered.filter(m => 
           m.genres && m.genres.some(g => selectedGenres.includes(g))
@@ -2070,11 +1989,45 @@
       section.classList.toggle('open');
     }
 
-    // Инициализация
-    initCarousel();
-    renderCatalog();
-    renderCountryFilters();
-    setupCheckboxHandlers();
+    // ЗАГРУЗКА ДАННЫХ ИЗ JSON
+    setTimeout(() => {
+      fetch('movies.json')
+        .then(response => response.json())
+        .then(data => {
+          movieData = data.movies.map(item => {
+            return {
+              id: item.identification.kinopoisk_id,
+              title: item.identification.title_ru,
+              year: item.identification.year,
+              rating: item.ratings.kinopoisk.value,
+              votes: item.ratings.kinopoisk.votes,
+              runtime: item.details.runtime_minutes,
+              age: item.details.age_ratings[0].rating,
+              country: item.details.countries[0],
+              countries: item.details.countries,
+              genres: item.details.genres,
+              format: item.identification.film_type.includes('документальный') ? 'Документальный' : (item.identification.film_type.includes('анимационный') ? 'Мультфильм' : 'Фильм'),
+              mood: item.content.mood,
+              whyWatch: item.content.synopsis,
+              poster: item.poster.path,
+              trailer: item.poster.path,
+              kpUrl: item.identification.kinopoisk_url,
+              trailerUrl: item.links.official_trailer.url
+            };
+          });
+          
+          filteredMovies = [...movieData];
+          
+          // Инициализация после загрузки данных
+          currentIndex = Math.floor(movieData.length / 2);
+          initCarousel();
+          renderCatalog();
+          renderCountryFilters();
+          renderGenreFilters();
+          setupCheckboxHandlers();
+        })
+        .catch(error => console.error('Ошибка загрузки данных:', error));
+    }, 300);
   </script>
 </body>
 </html>
