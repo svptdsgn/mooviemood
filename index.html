@@ -80,7 +80,7 @@
   .chat-input-row button { background: var(--surface); color: var(--text-dark); border: none; padding: 0 20px; border-radius: 100px; font-size: 18px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
   .chat-input-row button:hover { opacity: 0.9; }
 
-  /* --- МОДАЛКА ГЛАЗА (как на скрине 1) --- */
+  /* --- МОДАЛКА ГЛАЗА --- */
   .eye-modal { max-width: 900px; width: 90%; padding: 0; overflow: hidden; display: flex; flex-direction: row; min-height: 500px; background: #0F0F0F; border-radius: var(--radius-md); }
   .eye-modal-poster { width: 45%; background-size: cover; background-position: center; position: relative; }
   .eye-modal-content { width: 55%; padding: 40px; display: flex; flex-direction: column; position: relative; background: #0F0F0F; }
@@ -417,7 +417,7 @@
           <button class="reset-filters-btn" onclick="resetAllFilters()">Сбросить все фильтры</button>
         </div>
 
-        <!-- ВКЛАДКА ДОПОЛНИТЕЛЬНЫЕ (обновлена по скриншотам) -->
+        <!-- ВКЛАДКА ДОПОЛНИТЕЛЬНЫЕ (СЕЙЧАС РАБОТАЕТ) -->
         <div id="filter-extra" class="filter-content">
           <!-- Жанры -->
           <div class="filter-section open">
@@ -766,25 +766,13 @@
       let f = [...movieData];
       const sel = (id) => [...document.querySelectorAll('#' + id + ' .checkbox-item.active input')].map(i => i.value);
       
-      // Основные фильтры
       const countries = sel('countryFilters'); if (countries.length) f = f.filter(m => countries.includes(m.country));
       const years = sel('yearFilters'); if (years.length) f = f.filter(m => (years.includes('before2000') && m.year < 2000) || (years.includes('2000to2010') && m.year >= 2000 && m.year <= 2010) || (years.includes('2010to2020') && m.year > 2010 && m.year <= 2020) || (years.includes('after2020') && m.year > 2020));
       const runs = sel('runtimeFilters'); if (runs.length) f = f.filter(m => (runs.includes('short') && m.runtime < 90) || (runs.includes('medium') && m.runtime >= 90 && m.runtime <= 120) || (runs.includes('long') && m.runtime > 120));
       const rats = sel('ratingFilters'); if (rats.length) f = f.filter(m => { const r = parseFloat(m.rating); return (rats.includes('high') && r >= 8) || (rats.includes('medium') && r >= 7 && r < 8) || (rats.includes('low') && r < 7); });
       const ages = sel('ageFilters'); if (ages.length) f = f.filter(m => ages.includes(m.age));
-      
-      // Дополнительные фильтры
       const gens = sel('genreFilters'); if (gens.length) f = f.filter(m => m.genres && m.genres.some(g => gens.includes(g)));
       
-      // Новые фильтры (пока просто заглушки, так как данных в movies.json для них нет, 
-      // но код готов их принять, если ты добавишь поля в JSON)
-      // Например: m.occasion, m.plot, m.twist, m.tone, m.pace
-      const occasions = sel('occasionFilters'); if (occasions.length) f = f.filter(m => m.occasion && occasions.includes(m.occasion));
-      const plots = sel('plotFilters'); if (plots.length) f = f.filter(m => m.plot && plots.includes(m.plot));
-      const twists = sel('twistFilters'); if (twists.length) f = f.filter(m => m.twist && twists.includes(m.twist));
-      const tones = sel('toneFilters'); if (tones.length) f = f.filter(m => m.tone && tones.includes(m.tone));
-      const paces = sel('paceFilters'); if (paces.length) f = f.filter(m => m.pace && paces.includes(m.pace));
-
       const hideWatched = document.querySelector('#filter-main .filter-toggle-item:last-child .filter-toggle').classList.contains('active');
       if (hideWatched) f = f.filter(m => !watchedMovies.has(m.id));
       
